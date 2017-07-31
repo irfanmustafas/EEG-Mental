@@ -198,7 +198,7 @@ set(gcf,'position', [200 100 1500 800]);     % 위치 및 크기 설정
 % [~,xt2]             = min(abs(WT.time-1.6));
 
 
-Pinterval = 1:80000;
+Pinterval = 1:nTm;
 
 subplot(2,1,1); %Fp1
 ch = 1;
