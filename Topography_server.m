@@ -160,14 +160,55 @@ nCh      = length(chName);
 
 
 
+% grpPwr 변수 파일이 2G가 넘어서 별도 로딩
+% load('TgrpPwr.mat','grpPwr','WT','elocs','nFr','nTm','nCh','chName');
+load('grpInfo.mat','WT','elocs','nFr','nTm','nCh','chName');
+load('grpPwr.mat','grpPwr');
 
-load('TgrpPwr.mat','grpPwr','WT','elocs','nFr','nTm','nCh','chName');
+
+%%
 % 시간을 1~1.6초 구간만 잘라서 topography 그리기 (gmPwr은 앞에서 이미 gamma만 추출된 상태)
 % WT변수는 TgrpPwr.mat 파일에 저장되어 있던 것 읽어옴
+gm_freq  = (WT.freq >= 30) & (WT.freq < 50);
 roi_time    = [1.0 1.6];
 roi_idx     = (WT.time>=roi_time(1)) & (WT.time <= roi_time(2));
+gmPwr    = cellfun(@(x) squeeze(nanmean(x(:,gm_freq,:,:),2)),grpPwr(:,2),'uniformoutput',0);
 rgmPwr      = cellfun(@(x) squeeze(nanmean(x(:,roi_idx,:),2))',gmPwr,'uniformoutput',0);
+grp1        = rgmPwr{1,:};  % nSub (14) x nCh (28), nTm (150) 차원 통합됨
 grp2        = rgmPwr{2,:};  % nSub (14) x nCh (28), nTm (150) 차원 통합됨
-grp4        = rgmPwr{4,:};  % nSub (14) x nCh (28), nTm (150) 차원 통합됨
+grp3        = rgmPwr{3,:};  % nSub (14) x nCh (28), nTm (150) 차원 통합됨
 
 
+% [h,p]       = ttest2(grp1(:,:),grp2(:,:),'Tail','both','vartype','unequal');
+% chName(find(h),1) % 유의미한 채널 이름 출력
+% 
+% [h,p]       = ttest2(grp1(:,:),grp3(:,:),'Tail','both','vartype','unequal');
+% chName(find(h),1) % 유의미한 채널 이름 출력
+% 
+% [h,p]       = ttest2(grp2(:,:),grp3(:,:),'Tail','both','vartype','unequal');
+% chName(find(h),1) % 유의미한 채널 이름 출력
+
+elocs    = readlocs('Standard-10-20-Cap30.locs');
+f3 = figure;
+set(gcf,'position', [800 300 250 600]);
+
+h1 = subplot(3,1,1);
+temp = zeros(size(grp1,1), size(elocs,2));
+temp(:,1:size(grp1,2)) = grp1(:,:);
+grp1 = temp;
+h1 = topograph(h1, double(mean(grp1,1))', [], elocs, {'Depression'}, min(grp1(:)), max(grp1(:)), 0);
+cb = colorbar('EastOutside');
+
+h2 = subplot(3,1,2);
+temp = zeros(size(grp2,1), size(elocs,2));
+temp(:,1:size(grp2,2)) = grp2(:,:);
+grp2 = temp;
+h2 = topograph(h2, double(mean(grp2,1))', [], elocs, {'Panic'}, min(grp2(:)), max(grp2(:)), 0);
+cb = colorbar('EastOutside');
+
+h3 = subplot(3,1,3);
+temp = zeros(size(grp3,1), size(elocs,2));
+temp(:,1:size(grp3,2)) = grp3(:,:);
+grp3 = temp;
+h3 = topograph(h3, double(mean(grp3,1))', [], elocs, {'Normal'}, min(grp3(:)), max(grp3(:)), 0);
+cb = colorbar('EastOutside');
