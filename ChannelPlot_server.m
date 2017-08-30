@@ -164,7 +164,7 @@ load('grpPwr.mat','grpPwr');
 
 %%
 ch_tick        = 1:nCh;
-tm_tick        = [320 630 940 1250 1560];
+tm_tick        = [10 320 630 940 1250 1570];
 p_color        = [1 1 1; 1 0 0];
 x_tick_label   = cell(length(tm_tick),2);
 % % tm_tick에 들어 있는 320, 630, 940, 1250, 1560 초가 WT.time에 해당하는 index를 얻어옴
