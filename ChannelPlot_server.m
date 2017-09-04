@@ -178,10 +178,14 @@ x_tick_label   = x_tick_label(:,2);
 y_tick         = ch_tick;
 y_tick_label   = chName;
 
-% gamma 영역만 선택
+% 영역 선택
 gm_freq  = (WT.freq >= 30) & (WT.freq <= 50);
-% gm_freq  = (WT.freq >= 20) & (WT.freq < 30);
+mu_alpha_freq  = (WT.freq >= 8) & (WT.freq < 12);
+beta_freq = (WT.freq >= 12) & (WT.freq < 25);
+theta_freq = (WT.freq >= 4) & (WT.freq < 8);
 
+%% gamma 영역
+f2_1 = figure;
 gmPwr    = cellfun(@(x) squeeze(nanmean(x(:,gm_freq,:,:),2)),grpPwr(:,2),'uniformoutput',0);
 % gmPwr의 각 행은 그룹별로 nCh x nTm x nSub 상태, 그룹별 피험자 수가 다르면 nSub 값은 다름
 % grp1 우울증, grp2 공황장애, grp3 정상
@@ -190,7 +194,6 @@ grp2  = gmPwr{2,:};  grp2 = permute(grp2,[3 1 2]);
 grp3  = gmPwr{3,:};  grp3 = permute(grp3,[3 1 2]);
 
 
-f2 = figure;
 set(gcf,'position', [200 100 1500 800]);     % 위치 및 크기 설정
 
 % 1초와 1.6초 경계에 선 삽입할 index
@@ -250,7 +253,48 @@ set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
 % colormap(p_color);
 
 
+%% mu_alpha 영역
+f2_2 = figure;
+mu_alphaPwr    = cellfun(@(x) squeeze(nanmean(x(:,mu_alpha_freq,:,:),2)),grpPwr(:,2),'uniformoutput',0);
+% gmPwr의 각 행은 그룹별로 nCh x nTm x nSub 상태, 그룹별 피험자 수가 다르면 nSub 값은 다름
+% grp1 우울증, grp2 공황장애, grp3 정상
+grp1  = mu_alphaPwr{1,:};  grp1 = permute(grp1,[3 1 2]); % nSub x nCh x nTm
+grp2  = mu_alphaPwr{2,:};  grp2 = permute(grp2,[3 1 2]);
+grp3  = mu_alphaPwr{3,:};  grp3 = permute(grp3,[3 1 2]);
 
+
+set(gcf,'position', [200 100 1500 800]);     % 위치 및 크기 설정
+
+
+Pinterval = 1:nTm;
+
+subplot(2,1,1); %Fp1
+ch = 1;
+grp1_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
+grp2_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
+grp3_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
+hold on;
+plot(grp1_av); plot(grp2_av); plot(grp3_av);
+shading flat;
+hold off;
+
+title(chName{ch,1},'fontname','times','fontsize',12);
+set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
+legend('Depression', 'Panic', 'Normal');
+
+
+subplot(2,1,2); %Fp2
+ch = 2;
+grp1_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
+grp2_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
+grp3_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
+hold on;
+plot(grp1_av); plot(grp2_av); plot(grp3_av);
+shading flat;
+hold off;
+
+title(chName{ch,1},'fontname','times','fontsize',12);
+set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
 
 
 
