@@ -185,7 +185,7 @@ beta_freq = (WT.freq >= 12) & (WT.freq < 25);
 theta_freq = (WT.freq >= 4) & (WT.freq < 8);
 
 %% gamma 영역
-f2_1 = figure;
+f2_1 = figure('NumberTitle', 'off', 'Name', 'Gamma 30~50');
 gmPwr    = cellfun(@(x) squeeze(nanmean(x(:,gm_freq,:,:),2)),grpPwr(:,2),'uniformoutput',0);
 % gmPwr의 각 행은 그룹별로 nCh x nTm x nSub 상태, 그룹별 피험자 수가 다르면 nSub 값은 다름
 % grp1 우울증, grp2 공황장애, grp3 정상
@@ -205,11 +205,11 @@ Pinterval = 1:nTm;
 
 subplot(3,1,1); %Fp1
 ch = 1;
-grp1_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
-grp2_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
-grp3_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
+grp11_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
+grp21_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
+grp31_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
 hold on;
-plot(grp1_av); plot(grp2_av); plot(grp3_av);
+plot(grp11_av); plot(grp21_av); plot(grp31_av);
 shading flat;
 hold off;
 % h1 = line([xt1 xt1], [0 15]);   % 앞에 선 긋기
@@ -230,11 +230,11 @@ legend('Depression', 'Panic', 'Normal');
 
 subplot(3,1,2); %Fp2
 ch = 2;
-grp1_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
-grp2_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
-grp3_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
+grp12_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
+grp22_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
+grp32_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
 hold on;
-plot(grp1_av); plot(grp2_av); plot(grp3_av);
+plot(grp12_av); plot(grp22_av); plot(grp32_av);
 shading flat;
 hold off;
 % h1 = line([xt1 xt1], [0 15]);   % 앞에 선 긋기
@@ -253,8 +253,21 @@ set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
 % colormap(p_color);
 
 
+
+subplot(3,1,3); %Fp1 - Fp2
+grp1d_av = grp11_av - grp12_av;
+grp2d_av = grp21_av - grp22_av;
+grp3d_av = grp31_av - grp32_av;
+hold on;
+plot(grp1d_av); plot(grp2d_av); plot(grp3d_av);
+shading flat;
+hold off;
+title('Fp1 - Fp2','fontname','times','fontsize',12);
+set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
+
+
 %% mu_alpha 영역
-f2_2 = figure;
+f2_2 = figure('NumberTitle', 'off', 'Name', 'Mu_Alpah 8~12');
 mu_alphaPwr    = cellfun(@(x) squeeze(nanmean(x(:,mu_alpha_freq,:,:),2)),grpPwr(:,2),'uniformoutput',0);
 % gmPwr의 각 행은 그룹별로 nCh x nTm x nSub 상태, 그룹별 피험자 수가 다르면 nSub 값은 다름
 % grp1 우울증, grp2 공황장애, grp3 정상
@@ -270,36 +283,224 @@ Pinterval = 1:nTm;
 
 subplot(3,1,1); %Fp1
 ch = 1;
-grp1_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
-grp2_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
-grp3_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
+grp11_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
+grp21_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
+grp31_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
 hold on;
-plot(grp1_av); plot(grp2_av); plot(grp3_av);
+plot(grp11_av); plot(grp21_av); plot(grp31_av);
 shading flat;
 hold off;
-
+% h1 = line([xt1 xt1], [0 15]);   % 앞에 선 긋기
+% h2 = line([xt2 xt2], [0 15]);   % 뒤에 선 긋기
+% set([h1 h2],'Color','k','LineWidth',1)  % 선 색깔 및 두깨 설정
+% patch([xt1 xt2 xt2 xt1],[0 0 15 15],'k','FaceAlpha',.3) % 배경 회색 칠하기
+% set(gca,'children',flipud(get(gca,'children'))) % 그래프 배경 뒤에 가려진 것 다시 칠하기
+% hold off;
 title(chName{ch,1},'fontname','times','fontsize',12);
 set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
 legend('Depression', 'Panic', 'Normal');
-
+% p = gca;    % x축 라벨 속성 다시 가져옴
+% p.XTickLabel = {x_tick_label2{1},['\bf ' x_tick_label2{2}],['\bf ' x_tick_label2{3}], x_tick_label2{4}, x_tick_label2{5}};
+% % x축 라벨에서 두번째와 세번째 강조
+% % ylim([0 15]);   % y축 경계 값 0~15로 지정
+% %set(gca,'ytick',y_tick,'yticklabel',y_tick_label);
+% colormap(p_color);
 
 subplot(3,1,2); %Fp2
 ch = 2;
-grp1_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
-grp2_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
-grp3_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
+grp12_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
+grp22_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
+grp32_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
 hold on;
-plot(grp1_av); plot(grp2_av); plot(grp3_av);
+plot(grp12_av); plot(grp22_av); plot(grp32_av);
 shading flat;
 hold off;
-
+% h1 = line([xt1 xt1], [0 15]);   % 앞에 선 긋기
+% h2 = line([xt2 xt2], [0 15]);   % 뒤에 선 긋기
+% set([h1 h2],'Color','k','LineWidth',1)  % 선 색깔 및 두깨 설정
+% patch([xt1 xt2 xt2 xt1],[0 0 15 15],'k','FaceAlpha',.3) % 배경 회색 칠하기
+% set(gca,'children',flipud(get(gca,'children'))) % 그래프 배경 뒤에 가려진 것 다시 칠하기
+% hold off;
 title(chName{ch,1},'fontname','times','fontsize',12);
+set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
+% p = gca;    % x축 라벨 속성 다시 가져옴
+% p.XTickLabel = {x_tick_label2{1},['\bf ' x_tick_label2{2}],['\bf ' x_tick_label2{3}], x_tick_label2{4}, x_tick_label2{5}};
+% % x축 라벨에서 두번째와 세번째 강조
+% % ylim([0 15]);   % y축 경계 값 0~15로 지정
+% %set(gca,'ytick',y_tick,'yticklabel',y_tick_label);
+% colormap(p_color);
+
+
+
+subplot(3,1,3); %Fp1 - Fp2
+grp1d_av = grp11_av - grp12_av;
+grp2d_av = grp21_av - grp22_av;
+grp3d_av = grp31_av - grp32_av;
+hold on;
+plot(grp1d_av); plot(grp2d_av); plot(grp3d_av);
+shading flat;
+hold off;
+title('Fp1 - Fp2','fontname','times','fontsize',12);
 set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
 
 
 
 
 
+%% Beta 영역
+f2_3 = figure('NumberTitle', 'off', 'Name', 'Beta 12~25');
+betaPwr    = cellfun(@(x) squeeze(nanmean(x(:,beta_freq,:,:),2)),grpPwr(:,2),'uniformoutput',0);
+% gmPwr의 각 행은 그룹별로 nCh x nTm x nSub 상태, 그룹별 피험자 수가 다르면 nSub 값은 다름
+% grp1 우울증, grp2 공황장애, grp3 정상
+grp1  = betaPwr{1,:};  grp1 = permute(grp1,[3 1 2]); % nSub x nCh x nTm
+grp2  = betaPwr{2,:};  grp2 = permute(grp2,[3 1 2]);
+grp3  = betaPwr{3,:};  grp3 = permute(grp3,[3 1 2]);
+
+
+set(gcf,'position', [200 100 1500 800]);     % 위치 및 크기 설정
+
+
+Pinterval = 1:nTm;
+
+subplot(3,1,1); %Fp1
+ch = 1;
+grp11_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
+grp21_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
+grp31_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
+hold on;
+plot(grp11_av); plot(grp21_av); plot(grp31_av);
+shading flat;
+hold off;
+% h1 = line([xt1 xt1], [0 15]);   % 앞에 선 긋기
+% h2 = line([xt2 xt2], [0 15]);   % 뒤에 선 긋기
+% set([h1 h2],'Color','k','LineWidth',1)  % 선 색깔 및 두깨 설정
+% patch([xt1 xt2 xt2 xt1],[0 0 15 15],'k','FaceAlpha',.3) % 배경 회색 칠하기
+% set(gca,'children',flipud(get(gca,'children'))) % 그래프 배경 뒤에 가려진 것 다시 칠하기
+% hold off;
+title(chName{ch,1},'fontname','times','fontsize',12);
+set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
+legend('Depression', 'Panic', 'Normal');
+% p = gca;    % x축 라벨 속성 다시 가져옴
+% p.XTickLabel = {x_tick_label2{1},['\bf ' x_tick_label2{2}],['\bf ' x_tick_label2{3}], x_tick_label2{4}, x_tick_label2{5}};
+% % x축 라벨에서 두번째와 세번째 강조
+% % ylim([0 15]);   % y축 경계 값 0~15로 지정
+% %set(gca,'ytick',y_tick,'yticklabel',y_tick_label);
+% colormap(p_color);
+
+subplot(3,1,2); %Fp2
+ch = 2;
+grp12_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
+grp22_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
+grp32_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
+hold on;
+plot(grp12_av); plot(grp22_av); plot(grp32_av);
+shading flat;
+hold off;
+% h1 = line([xt1 xt1], [0 15]);   % 앞에 선 긋기
+% h2 = line([xt2 xt2], [0 15]);   % 뒤에 선 긋기
+% set([h1 h2],'Color','k','LineWidth',1)  % 선 색깔 및 두깨 설정
+% patch([xt1 xt2 xt2 xt1],[0 0 15 15],'k','FaceAlpha',.3) % 배경 회색 칠하기
+% set(gca,'children',flipud(get(gca,'children'))) % 그래프 배경 뒤에 가려진 것 다시 칠하기
+% hold off;
+title(chName{ch,1},'fontname','times','fontsize',12);
+set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
+% p = gca;    % x축 라벨 속성 다시 가져옴
+% p.XTickLabel = {x_tick_label2{1},['\bf ' x_tick_label2{2}],['\bf ' x_tick_label2{3}], x_tick_label2{4}, x_tick_label2{5}};
+% % x축 라벨에서 두번째와 세번째 강조
+% % ylim([0 15]);   % y축 경계 값 0~15로 지정
+% %set(gca,'ytick',y_tick,'yticklabel',y_tick_label);
+% colormap(p_color);
 
 
 
+subplot(3,1,3); %Fp1 - Fp2
+grp1d_av = grp11_av - grp12_av;
+grp2d_av = grp21_av - grp22_av;
+grp3d_av = grp31_av - grp32_av;
+hold on;
+plot(grp1d_av); plot(grp2d_av); plot(grp3d_av);
+shading flat;
+hold off;
+title('Fp1 - Fp2','fontname','times','fontsize',12);
+set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
+
+
+
+
+
+%% Theta 영역
+f2_4 = figure('NumberTitle', 'off', 'Name', 'Theta 4~8');
+thetaPwr    = cellfun(@(x) squeeze(nanmean(x(:,theta_freq,:,:),2)),grpPwr(:,2),'uniformoutput',0);
+% gmPwr의 각 행은 그룹별로 nCh x nTm x nSub 상태, 그룹별 피험자 수가 다르면 nSub 값은 다름
+% grp1 우울증, grp2 공황장애, grp3 정상
+grp1  = thetaPwr{1,:};  grp1 = permute(grp1,[3 1 2]); % nSub x nCh x nTm
+grp2  = thetaPwr{2,:};  grp2 = permute(grp2,[3 1 2]);
+grp3  = thetaPwr{3,:};  grp3 = permute(grp3,[3 1 2]);
+
+
+set(gcf,'position', [200 100 1500 800]);     % 위치 및 크기 설정
+
+
+Pinterval = 1:nTm;
+
+subplot(3,1,1); %Fp1
+ch = 1;
+grp11_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
+grp21_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
+grp31_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
+hold on;
+plot(grp11_av); plot(grp21_av); plot(grp31_av);
+shading flat;
+hold off;
+% h1 = line([xt1 xt1], [0 15]);   % 앞에 선 긋기
+% h2 = line([xt2 xt2], [0 15]);   % 뒤에 선 긋기
+% set([h1 h2],'Color','k','LineWidth',1)  % 선 색깔 및 두깨 설정
+% patch([xt1 xt2 xt2 xt1],[0 0 15 15],'k','FaceAlpha',.3) % 배경 회색 칠하기
+% set(gca,'children',flipud(get(gca,'children'))) % 그래프 배경 뒤에 가려진 것 다시 칠하기
+% hold off;
+title(chName{ch,1},'fontname','times','fontsize',12);
+set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
+legend('Depression', 'Panic', 'Normal');
+% p = gca;    % x축 라벨 속성 다시 가져옴
+% p.XTickLabel = {x_tick_label2{1},['\bf ' x_tick_label2{2}],['\bf ' x_tick_label2{3}], x_tick_label2{4}, x_tick_label2{5}};
+% % x축 라벨에서 두번째와 세번째 강조
+% % ylim([0 15]);   % y축 경계 값 0~15로 지정
+% %set(gca,'ytick',y_tick,'yticklabel',y_tick_label);
+% colormap(p_color);
+
+subplot(3,1,2); %Fp2
+ch = 2;
+grp12_av = mean(squeeze(grp1(:,ch,Pinterval))',2);
+grp22_av = mean(squeeze(grp2(:,ch,Pinterval))',2);
+grp32_av = mean(squeeze(grp3(:,ch,Pinterval))',2);
+hold on;
+plot(grp12_av); plot(grp22_av); plot(grp32_av);
+shading flat;
+hold off;
+% h1 = line([xt1 xt1], [0 15]);   % 앞에 선 긋기
+% h2 = line([xt2 xt2], [0 15]);   % 뒤에 선 긋기
+% set([h1 h2],'Color','k','LineWidth',1)  % 선 색깔 및 두깨 설정
+% patch([xt1 xt2 xt2 xt1],[0 0 15 15],'k','FaceAlpha',.3) % 배경 회색 칠하기
+% set(gca,'children',flipud(get(gca,'children'))) % 그래프 배경 뒤에 가려진 것 다시 칠하기
+% hold off;
+title(chName{ch,1},'fontname','times','fontsize',12);
+set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
+% p = gca;    % x축 라벨 속성 다시 가져옴
+% p.XTickLabel = {x_tick_label2{1},['\bf ' x_tick_label2{2}],['\bf ' x_tick_label2{3}], x_tick_label2{4}, x_tick_label2{5}};
+% % x축 라벨에서 두번째와 세번째 강조
+% % ylim([0 15]);   % y축 경계 값 0~15로 지정
+% %set(gca,'ytick',y_tick,'yticklabel',y_tick_label);
+% colormap(p_color);
+
+
+
+subplot(3,1,3); %Fp1 - Fp2
+grp1d_av = grp11_av - grp12_av;
+grp2d_av = grp21_av - grp22_av;
+grp3d_av = grp31_av - grp32_av;
+hold on;
+plot(grp1d_av); plot(grp2d_av); plot(grp3d_av);
+shading flat;
+hold off;
+title('Fp1 - Fp2','fontname','times','fontsize',12);
+set(gca,'xtick',x_tick,'xticklabel',x_tick_label);    % x축 라벨 삽입
