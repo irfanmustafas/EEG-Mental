@@ -365,13 +365,13 @@ for s = 1:nSub
    sub_grp     = subInfo{s,2};
    set_name    = [sub_name '.set'];
    EEG         = pop_loadset('filepath', REP_DIR,'filename', set_name);
-   chPwr       = zeros(nCh,nFr,nTm,'single');
+   chPwr       = zeros(nCh,nFr,nTm,'single');       %4차원 정의, 채널xBandx시간x인원수
    for ch = 1:nCh
       [spectrum,~,~]    = ft_specest_wavelet(double(EEG.data(ch,:)), WT.time, 'verbose',0, ...
          'freqoi',WT.freq,'timeoi',WT.time,'width',WT.width,'gwidth',WT.gwidth);
       chPwr(ch,:,:)     = single(10*log10(abs(squeeze(spectrum))));
    end
-   grpPwr{sub_grp,2}    = cat(4,grpPwr{sub_grp,2},chPwr);
+   grpPwr{sub_grp,2}    = cat(4,grpPwr{sub_grp,2},chPwr);   %chPwr가 4차원임으로
 end
 
 % grpPwr 용량이 2G를 넘어서 별도 저장
