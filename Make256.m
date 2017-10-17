@@ -18,6 +18,11 @@ for p = 1:pSize(1)
     for q = 1:qLimit
         pVst = q;
         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
+        
+        if strcmp(dPath, 'E004-1'), continue, end
+        if ~Sinfo(p,iAge+q), continue, end
+        
         disp(dPath);
+        GetPwr256(dPath);
     end
 end
