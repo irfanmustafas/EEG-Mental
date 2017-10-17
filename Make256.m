@@ -23,6 +23,6 @@ for p = 1:pSize(1)
         if ~Sinfo(p,iAge+q), continue, end
         
         disp(dPath);
-        GetPwr256(dPath);
+        SaveSet256(dPath);
     end
 end
