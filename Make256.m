@@ -1,13 +1,10 @@
 close all; clear; clc;
 
-RAW_DIR  = '../data/';
-REP_DIR  = './Rep/';
-
 load('S256.mat');
-
 pSize = size(Sinfo);
 iID = 1; iSym = 2; iGen = 3; iAge = 4; iHav = 10; iDO = 12;
 dPath = '';
+pwr256 = cell(0,6);
 
 for p = 1:pSize(1)
     if Sinfo(p, iDO), continue, end
