@@ -1,14 +1,9 @@
-function [] = SaveSet256(dPath)
+function [] = SaveSet256(dPath, nCh)
 RAW_DIR  = '../data/';
 REP_DIR  = './Rep/';
 
 oFs      = 256;     % 원래 Sampling Rate
 Fs       = 256;     % 변환할 Sampling Rate
-elocs    = readlocs('Standard-10-20-Cap2.locs');
-chName   = {elocs.labels}';
-nCh      = length(chName);
-
-EEG      = pop_loadset('sample.set');
 
 txt_name    = [RAW_DIR dPath '/EEG-1.txt'];
 ch1         = dlmread(txt_name);
@@ -18,6 +13,7 @@ ch2         = dlmread(txt_name);
 ch2(:,1) = [];
 data = [ch1'; ch2'];
 
+EEG      = pop_loadset('sample.set');
 EEG.setname = dPath;
 EEG.data    = data;
 EEG.pnts    = size(EEG.data,2);

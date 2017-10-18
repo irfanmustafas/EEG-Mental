@@ -3,8 +3,14 @@ close all; clear; clc;
 load('S256.mat');
 pSize = size(Sinfo);
 iID = 1; iSym = 2; iGen = 3; iAge = 4; iHav = 10; iDO = 12;
+
+elocs    = readlocs('Standard-10-20-Cap2.locs');
+chName   = {elocs.labels}';
+nCh      = length(chName);
+
 dPath = '';
 pwr256 = cell(0,6);
+
 
 for p = 1:pSize(1)
     if Sinfo(p, iDO), continue, end
@@ -24,6 +30,6 @@ for p = 1:pSize(1)
         if ~Sinfo(p,iAge+q), continue, end
         
         disp(dPath);
-        SaveSet256(dPath);
+        SaveSet256(dPath, nCh);
     end
 end
