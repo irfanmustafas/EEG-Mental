@@ -19,6 +19,7 @@ for p = 1:pSize(1)
         pVst = q;
         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
         
+        % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
         if strcmp(dPath, 'E004-1'), continue, end
         if ~Sinfo(p,iAge+q), continue, end
         
