@@ -8,8 +8,6 @@ elocs    = readlocs('Standard-10-20-Cap2.locs');
 chName   = {elocs.labels}';
 nCh      = length(chName);
 
-LowF     = 0;
-HighF    = 55;
 EEG      = pop_loadset('sample.set');
 
 txt_name    = [RAW_DIR dPath '/EEG-1.txt'];
