@@ -11,11 +11,11 @@ nCh      = length(chName);
 REP_DIR  = './Rep/';
 TF.tWin     = 0.50;
 TF.tShift   = 0.10;
-TF.Fs       = 256;                      % 256 Hz Resolution
-TF.frange   = [0 55];                   % 0~55 Hz 범위
-TF.nWin        = fix(TF.tWin*TF.Fs);    % nWin은 Fs의 절반(0.05)로 설정, 128
-TF.nShift      = fix(TF.tShift*TF.Fs);  % nShift는 Fs의 1/10(0.1)의 정수로 설정, 25
-TF.nFFT        = 2^nextpow2(nWin);      % nWin과 가장 가까운 2의 거듭제곱 수 구하기
+TF.Fs       = 256;                   % 256 Hz Resolution
+TF.frange   = [0 55];                % 0~55 Hz 범위
+TF.nWin     = fix(TF.tWin*TF.Fs);    % nWin은 Fs의 절반(0.05)로 설정, 128
+TF.nShift   = fix(TF.tShift*TF.Fs);  % nShift는 Fs의 1/10(0.1)의 정수로 설정, 25
+TF.nFFT     = 2^nextpow2(nWin);      % nWin과 가장 가까운 2의 거듭제곱 수 구하기
 TF.f_idx = [];
 
 dPath = '';
