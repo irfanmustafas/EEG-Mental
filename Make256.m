@@ -58,3 +58,12 @@ for p = 1:pSize(1)
 
     end
 end
+
+
+% 영역 선택, https://en.wikipedia.org/wiki/Electroencephalography
+gm_freq  = (WT.freq >= 30) & (WT.freq <= 50);
+mu_freq  = (WT.freq >= 8) & (WT.freq < 12);
+alpha_freq  = (WT.freq >= 8) & (WT.freq < 15);
+beta_freq = (WT.freq >= 15) & (WT.freq < 30);
+theta_freq = (WT.freq >= 4) & (WT.freq < 8);
+delta_freq = (WT.freq >= 0.2) & (WT.freq < 4);
