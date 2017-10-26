@@ -29,7 +29,16 @@ EEG         = eeg_checkset(EEG);
 EEG         = pop_resample(EEG,Fs);
 
 % Low Pass Filter
-%%%%% LPF for EEG channels
+%%%%% Low Pass Filter for EEG channels
+%     Ap    - Passband Ripple (dB)
+%     Ast   - Stopband Attenuation (dB)
+%     F3dB  - 3dB Frequency
+%     Fc    - Cutoff Frequency
+%     Fp    - Passband Frequency
+%     Fst   - Stopband Frequency
+%     N     - Filter Order
+%     Nb    - Numerator Order
+%     Na    - Denominator Order
 ld_LPF      = fdesign.lowpass('N,Fp,Fst',250,HighF,HighF+2,Fs);
 Ld_LPF      = design(ld_LPF,'firls');
 fprintf('LPF...\n');
