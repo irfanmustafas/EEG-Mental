@@ -1,9 +1,9 @@
-function [] = SaveSet256(dPath, nCh)
+function [] = SaveSet256(dPath, nCh, TF)
 RAW_DIR  = '../data/';
 REP_DIR  = './Rep/';
 
-oFs      = 256;     % 원래 Sampling Rate
-Fs       = 256;     % 변환할 Sampling Rate
+oFs      = TF.Fs;     % 원래 Sampling Rate
+Fs       = TF.Fs;     % 변환할 Sampling Rate
 
 txt_name    = [RAW_DIR dPath '/EEG-1.txt'];
 ch1         = dlmread(txt_name);
@@ -25,10 +25,10 @@ EEG.xmax    = EEG.times(end);
 EEG.chanlocs = elocs;
 EEG         = eeg_checkset(EEG);
 
-%%%% down sampling oFs (256)->Fs(256)
+%%%% down sampling oFs(256) -> Fs(256)
 EEG         = pop_resample(EEG,Fs);
+HighF       = TF.frange(2);
 
-% Low Pass Filter
 %%%%% Low Pass Filter for EEG channels
 %     Ap    - Passband Ripple (dB)
 %     Ast   - Stopband Attenuation (dB)

@@ -15,7 +15,7 @@ TF.Fs       = 256;                   % 256 Hz Resolution
 TF.frange   = [0 55];                % 0~55 Hz 범위
 TF.nWin     = fix(TF.tWin*TF.Fs);    % nWin은 Fs의 절반(0.05)로 설정, 128
 TF.nShift   = fix(TF.tShift*TF.Fs);  % nShift는 Fs의 1/10(0.1)의 정수로 설정, 25
-TF.nFFT     = 2^nextpow2(nWin);      % nWin과 가장 가까운 2의 거듭제곱 수 구하기
+TF.nFFT     = 2^nextpow2(TF.nWin);      % nWin과 가장 가까운 2의 거듭제곱 수 구하기
 TF.f_idx = [];
 
 dPath = '';
@@ -39,7 +39,7 @@ for p = 1:pSize(1)
         if ~Sinfo(p,iAge+q), continue, end
         
         disp(dPath);
-        SaveSet256(dPath, nCh);
+        SaveSet256(dPath, nCh, TF);
         
         if isempty(TF.f_idx)
             set_name = [dPath '.set'];
@@ -61,7 +61,7 @@ end
 
 
 % 영역 선택, https://en.wikipedia.org/wiki/Electroencephalography
-gm_freq  = (WT.freq >= 30) & (WT.freq <= 50);
+gm_freq  = (WT.freq >= 30) & (WT.freq <= 55);
 mu_freq  = (WT.freq >= 8) & (WT.freq < 12);
 alpha_freq  = (WT.freq >= 8) & (WT.freq < 15);
 beta_freq = (WT.freq >= 15) & (WT.freq < 30);
