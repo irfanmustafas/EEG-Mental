@@ -1,6 +1,9 @@
 close all; clear; clc;
 
 load('S256.mat');
+Sinfo(75,10) = 4;    % E077-4 번부터 2048이라 직접 입력해 줌
+Sinfo(76,10) = 4;    % E078-4 번부터 2048이라 직접 입력해 줌
+
 pSize = size(Sinfo);
 % 피험자 ID 주소 iID, 피험자 질환 주소 iSym, 피험자 성별 주소 iAge, 행동 실험 여부 주소 iHav, 
 iID = 1; iSym = 2; iGen = 3; iAge = 4; iHav = 10; iDO = 12;
@@ -110,9 +113,9 @@ end
 
 
 % 영역 선택, https://en.wikipedia.org/wiki/Electroencephalography
-gm_freq  = (WT.freq >= 30) & (WT.freq <= 55);
-mu_freq  = (WT.freq >= 8) & (WT.freq < 12);
-alpha_freq  = (WT.freq >= 8) & (WT.freq < 15);
-beta_freq = (WT.freq >= 15) & (WT.freq < 30);
-theta_freq = (WT.freq >= 4) & (WT.freq < 8);
-delta_freq = (WT.freq >= 0.2) & (WT.freq < 4);
+% gm_freq  = (WT.freq >= 30) & (WT.freq <= 55);
+% mu_freq  = (WT.freq >= 8) & (WT.freq < 12);
+% alpha_freq  = (WT.freq >= 8) & (WT.freq < 15);
+% beta_freq = (WT.freq >= 15) & (WT.freq < 30);
+% theta_freq = (WT.freq >= 4) & (WT.freq < 8);
+% delta_freq = (WT.freq >= 0.2) & (WT.freq < 4);
