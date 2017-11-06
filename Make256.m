@@ -77,8 +77,21 @@ for p = 1:pSize(1)
         if strcmp(dPath, 'E004-1'), continue, end
         if ~Sinfo(p,iAge+q), continue, end
         
+        if isempty(TF.f_idx)
+            set_name = [dPath '.set'];
+            EEG = pop_loadset('filepath', REP_DIR, 'filename', set_name);
+            
+            % F값 범위 할당(TF.f_idx) 위해 한번 먼저 실행
+            [S,F,T,P]   = spectrogram(double(EEG.data(1,:)),TF.nWin,TF.nWin-TF.nShift,TF.nFFT,TF.Fs);
+            TF.f_idx    = (F>=TF.frange(1)) & (F<=TF.frange(2));    % Frequencey 쳐내기
+            TF.freq     = F(TF.f_idx);
+            TF.time     = T;
+            % 0~55 Hz 해당하는 Frequencey만 쳐냄, 범위의 딱 절반은 아니고 +/- 1 정도 됨.
+            % F값을 실제로 열어보면 0, 1.953125, 3.90625, 5.859375, 7.81250 ... 순서
+        end
+        
         disp(dPath);
-        pwr = GetPwr256(dPath, nCh, TF, elocs);
+        pwr = GetPwr256(dPath, nCh, TF);
     end
 end
 
