@@ -1,4 +1,4 @@
-close all; clear; clc;
+% close all; clear; clc;
 
 load('S256.mat');
 Sinfo(75,10) = 4;    % E077-4 번부터 2048이라 직접 입력해 줌
@@ -64,7 +64,10 @@ pwr256 = cell(0,6);
 % end
 
 %% EEGLAB 데이터 읽어서 Raw Power 값 기록 (GetPwr256.m)
-totalPwr = cell(0,6);
+% 피험자 ID, 질환 증상, 성별, 나이, 방문 횟수, Power값 -> n x 6 행렬
+tempPwr =  cell(1, 6);     % 각 데이터별 값 임시 저장
+tPwr256 = cell(0,6);    % 전체 데이터 값 저장
+
 for p = 1:pSize(1)
     if Sinfo(p, iDO), continue, end
     
@@ -101,16 +104,18 @@ for p = 1:pSize(1)
             % F값을 실제로 열어보면 0, 1.953125, 3.90625, 5.859375, 7.81250 ... 순서
         end
         
-        temp =  cell(1, 6);
         disp(dPath);
-        pwr = GetPwr256(dPath, nCh, TF);
-        temp(1,1:6) = {pID, pSym, pGen, pAge, pVst, pwr};
+        Pwr = GetPwr256(dPath, nCh, TF);
+        tempPwr(1,1:6) = {pID, pSym, pGen, pAge, pVst, Pwr};
+        save([REP_DIR dPath '_Pwr' '.mat'], 'Pwr', '-v7.3')
         
-        totalPwr = cat(1, totalPwr, temp);
+        tPwr256 = cat(1, tPwr256, tempPwr);
     end
 end
+save([REP_DIR 'tPwr256.mat'], 'tPwr256', '-v7.3')
 
 
+%% 각 Raw Power 마다 Band 별 Sperctarl Power 계산
 
 % 영역 선택, https://en.wikipedia.org/wiki/Electroencephalography
 % gm_freq  = (WT.freq >= 30) & (WT.freq <= 55);
