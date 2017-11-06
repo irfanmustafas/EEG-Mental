@@ -39,7 +39,7 @@ for p = 1:pSize(1)
         if ~Sinfo(p,iAge+q), continue, end
         
         disp(dPath);
-        SaveSet256(dPath, nCh, TF);
+        SaveSet256(dPath, nCh, TF, elocs);
         
         if isempty(TF.f_idx)
             set_name = [dPath '.set'];

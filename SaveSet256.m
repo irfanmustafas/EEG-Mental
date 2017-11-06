@@ -1,4 +1,4 @@
-function [] = SaveSet256(dPath, nCh, TF)
+function [] = SaveSet256(dPath, nCh, TF, elocs)
 RAW_DIR  = '../data/';
 REP_DIR  = './Rep/';
 
