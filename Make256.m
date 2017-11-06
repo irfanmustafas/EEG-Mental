@@ -31,10 +31,14 @@ pwr256 = cell(0,6);
 %     if cLimit == 0, qLimit = 5;
 %     else qLimit = cLimit - 1; end
 %        
+%     % 실험 프로토콜이 바뀌기 전까지 qLimit 표시까지만, qLimit 부터는 2048Hz
 %     for q = 1:qLimit
 %         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
 %         
 %         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
+%         % E003-1은 혼자 데이터 길이가 감, E004-1은 2번 채널이 없음
+%         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
+%         if strcmp(dPath, 'E003-1'), continue, end
 %         if strcmp(dPath, 'E004-1'), continue, end
 %         if ~Sinfo(p,iAge+q), continue, end
 %         
@@ -57,7 +61,7 @@ pwr256 = cell(0,6);
 % end
 
 %% EEGLAB 데이터 읽어서 Raw Power 값 기록 (GetPwr256.m)
-
+totalPwr = cell(0,6);
 for p = 1:pSize(1)
     if Sinfo(p, iDO), continue, end
     
@@ -68,12 +72,16 @@ for p = 1:pSize(1)
     % pID 피험자 ID, pSym 질환 증상, pGen 성별, pAge 나이
     pID = Sinfo(p,iID); pSym = Sinfo(p,iSym); pGen = Sinfo(p,iGen); pAge = Sinfo(p,iAge);
     
+    % 실험 프로토콜이 바뀌기 전까지 qLimit 표시까지만, qLimit 부터는 2048Hz
     for q = 1:qLimit
         % 방문 횟수 pVst
         pVst = q;
         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
         
         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
+        % E003-1은 혼자 데이터 길이가 감, E004-1은 2번 채널이 없음
+        % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
+        if strcmp(dPath, 'E003-1'), continue, end
         if strcmp(dPath, 'E004-1'), continue, end
         if ~Sinfo(p,iAge+q), continue, end
         
@@ -90,8 +98,12 @@ for p = 1:pSize(1)
             % F값을 실제로 열어보면 0, 1.953125, 3.90625, 5.859375, 7.81250 ... 순서
         end
         
+        temp =  cell(1, 6);
         disp(dPath);
         pwr = GetPwr256(dPath, nCh, TF);
+        temp(1,1:6) = {pID, pSym, pGen, pAge, pVst, pwr};
+        
+        totalPwr = cat(1, totalPwr, temp);
     end
 end
 
