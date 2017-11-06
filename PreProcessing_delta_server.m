@@ -349,7 +349,7 @@ subplot(3,1,1); title(gca, 'Fp1 - Fp2');
 
 msTime = length(ch1)/Fs*1000;
 
-spec_freq   = [0 55];
+spec_freq   = [0 55];           % delta 영역 포함하도록 2부터 아닌 0부터 시작
 WT.width    = 5;
 WT.gwidth   = 3;
 WT.freq     = spec_freq(1):1:spec_freq(2);
