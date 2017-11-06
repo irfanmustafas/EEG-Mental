@@ -2,6 +2,7 @@ close all; clear; clc;
 
 load('S256.mat');
 pSize = size(Sinfo);
+% 피험자 ID 주소 iID, 피험자 질환 주소 iSym, 피험자 성별 주소 iAge, 행동 실험 여부 주소 iHav, 
 iID = 1; iSym = 2; iGen = 3; iAge = 4; iHav = 10; iDO = 12;
 
 elocs    = readlocs('Standard-10-20-Cap2.locs');
@@ -21,6 +22,42 @@ TF.f_idx = [];
 dPath = '';
 pwr256 = cell(0,6);
 
+
+%% TXT Raw DATA EEGLAB 데이터로 변환 과정 (SaveSet256.m)
+% for p = 1:pSize(1)
+%     if Sinfo(p, iDO), continue, end
+%     
+%     cLimit = Sinfo(p,iHav);
+%     if cLimit == 0, qLimit = 5;
+%     else qLimit = cLimit - 1; end
+%        
+%     for q = 1:qLimit
+%         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
+%         
+%         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
+%         if strcmp(dPath, 'E004-1'), continue, end
+%         if ~Sinfo(p,iAge+q), continue, end
+%         
+%         disp(dPath);
+%         SaveSet256(dPath, nCh, TF, elocs);
+%         
+%         if isempty(TF.f_idx)
+%             set_name = [dPath '.set'];
+%             EEG = pop_loadset('filepath', REP_DIR, 'filename', set_name);
+%             
+%             % F값 범위 할당(TF.f_idx) 위해 한번 먼저 실행
+%             [S,F,T,P]   = spectrogram(double(EEG.data(1,:)),TF.nWin,TF.nWin-TF.nShift,TF.nFFT,TF.Fs);
+%             TF.f_idx    = (F>=TF.frange(1)) & (F<=TF.frange(2));    % Frequencey 쳐내기
+%             TF.freq     = F(TF.f_idx);
+%             TF.time     = T;
+%             % 0~55 Hz 해당하는 Frequencey만 쳐냄, 범위의 딱 절반은 아니고 +/- 1 정도 됨.
+%             % F값을 실제로 열어보면 0, 1.953125, 3.90625, 5.859375, 7.81250 ... 순서
+%         end
+%     end
+% end
+
+%% EEGLAB 데이터 읽어서 Raw Power 값 기록 (GetPwr256.m)
+
 for p = 1:pSize(1)
     if Sinfo(p, iDO), continue, end
     
@@ -28,9 +65,11 @@ for p = 1:pSize(1)
     if cLimit == 0, qLimit = 5;
     else qLimit = cLimit - 1; end
     
+    % pID 피험자 ID, pSym 질환 증상, pGen 성별, pAge 나이
     pID = Sinfo(p,iID); pSym = Sinfo(p,iSym); pGen = Sinfo(p,iGen); pAge = Sinfo(p,iAge);
     
     for q = 1:qLimit
+        % 방문 횟수 pVst
         pVst = q;
         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
         
@@ -39,25 +78,10 @@ for p = 1:pSize(1)
         if ~Sinfo(p,iAge+q), continue, end
         
         disp(dPath);
-        SaveSet256(dPath, nCh, TF, elocs);
-        
-        if isempty(TF.f_idx)
-            set_name = [dPath '.set'];
-            EEG = pop_loadset('filepath', REP_DIR, 'filename', set_name);
-            
-            % F값 범위 할당(TF.f_idx) 위해 한번 먼저 실행
-            [S,F,T,P]   = spectrogram(double(EEG.data(1,:)),TF.nWin,TF.nWin-TF.nShift,TF.nFFT,TF.Fs);
-            TF.f_idx    = (F>=TF.frange(1)) & (F<=TF.frange(2));    % Frequencey 쳐내기
-            TF.freq     = F(TF.f_idx);
-            TF.time     = T;
-            % 0~55 Hz 해당하는 Frequencey만 쳐냄, 범위의 딱 절반은 아니고 +/- 1 정도 됨.
-            % F값을 실제로 열어보면 0, 1.953125, 3.90625, 5.859375, 7.81250 ... 순서
-        end
-        
-
-
+        pwr = GetPwr256(dPath, nCh, TF, elocs);
     end
 end
+
 
 
 % 영역 선택, https://en.wikipedia.org/wiki/Electroencephalography
