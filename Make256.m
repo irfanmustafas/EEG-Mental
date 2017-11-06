@@ -57,13 +57,17 @@ pwr256 = cell(0,6);
 %             TF.f_idx    = (F>=TF.frange(1)) & (F<=TF.frange(2));    % Frequencey 쳐내기
 %             TF.freq     = F(TF.f_idx);
 %             TF.time     = T;
-%             % 0~55 Hz 해당하는 Frequencey만 쳐냄, 범위의 딱 절반은 아니고 +/- 1 정도 됨.
-%             % F값을 실제로 열어보면 0, 1.953125, 3.90625, 5.859375, 7.81250 ... 순서
+%             % 0~55 Hz 해당하는 Frequencey만 쳐냄
 %         end
 %     end
 % end
+% TF 값 다음에 쓰기 위해 저장
+% save([REP_DIR 'TF.mat'], 'TF')
+
 
 %% EEGLAB 데이터 읽어서 Raw Power 값 기록 (GetPwr256.m)
+% TF 값 불러오기
+load([REP_DIR 'TF.mat'])
 % 피험자 ID, 질환 증상, 성별, 나이, 방문 횟수, Power값 -> n x 6 행렬
 tempPwr =  cell(1, 6);     % 각 데이터별 값 임시 저장
 tPwr256 = cell(0,6);    % 전체 데이터 값 저장
@@ -89,25 +93,12 @@ for p = 1:pSize(1)
         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
         if strcmp(dPath, 'E003-1'), continue, end
         if strcmp(dPath, 'E004-1'), continue, end
-        if ~Sinfo(p,iAge+q), continue, end
-        
-        if isempty(TF.f_idx)
-            set_name = [dPath '.set'];
-            EEG = pop_loadset('filepath', REP_DIR, 'filename', set_name);
-            
-            % F값 범위 할당(TF.f_idx) 위해 한번 먼저 실행
-            [S,F,T,P]   = spectrogram(double(EEG.data(1,:)),TF.nWin,TF.nWin-TF.nShift,TF.nFFT,TF.Fs);
-            TF.f_idx    = (F>=TF.frange(1)) & (F<=TF.frange(2));    % Frequencey 쳐내기
-            TF.freq     = F(TF.f_idx);
-            TF.time     = T;
-            % 0~55 Hz 해당하는 Frequencey만 쳐냄, 범위의 딱 절반은 아니고 +/- 1 정도 됨.
-            % F값을 실제로 열어보면 0, 1.953125, 3.90625, 5.859375, 7.81250 ... 순서
-        end
-        
+        if ~Sinfo(p,iAge+q), continue, end        
+    
         disp(dPath);
         Pwr = GetPwr256(dPath, nCh, TF);
         tempPwr(1,1:6) = {pID, pSym, pGen, pAge, pVst, Pwr};
-        save([REP_DIR dPath '_Pwr' '.mat'], 'Pwr', '-v7.3')
+        save([REP_DIR dPath '_Pwr' '.mat'], 'Pwr')
         
         tPwr256 = cat(1, tPwr256, tempPwr);
     end
