@@ -1,4 +1,4 @@
-function [] = SaveSet256(dPath, nCh, TF, elocs)
+function lines = SaveSet256(dPath, nCh, TF, elocs)
 RAW_DIR  = '../data/';
 REP_DIR  = './Rep/';
 
@@ -47,3 +47,4 @@ for n = 1:size(EEG.data,1)
 end
 
 pop_saveset(EEG, 'filename', dPath, 'filepath', REP_DIR);
+lines = length(data);

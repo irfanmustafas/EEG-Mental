@@ -46,7 +46,7 @@ pwr256 = cell(0,6);
 %         if ~Sinfo(p,iAge+q), continue, end
 %         
 %         disp(dPath);
-%         SaveSet256(dPath, nCh, TF, elocs);
+%         TF.lines = SaveSet256(dPath, nCh, TF, elocs);
 %         
 %         if isempty(TF.f_idx)
 %             set_name = [dPath '.set'];
@@ -61,7 +61,7 @@ pwr256 = cell(0,6);
 %         end
 %     end
 % end
-% TF 값 다음에 쓰기 위해 저장
+% % TF 값 다음에 쓰기 위해 저장
 % save([REP_DIR 'TF.mat'], 'TF')
 
 
@@ -108,19 +108,57 @@ pwr256 = cell(0,6);
 % save([REP_DIR 'tPwr256.mat'], 'tPwr256', '-v7.3')
 
 
-%% EEGLAB 데이터 읽어서 Wavlet Power 값 기록 (GetWav256.m)
+%% EEGLAB 데이터 읽어서 Wavelet Power 값 기록 (GetWav256.m)
 % TF 값 불러오기
 load([REP_DIR 'TF.mat'])
-msTime = length(ch1)/TF.Fs*1000;
+
+msTime = TF.lines/TF.Fs*1000;
 WT.width    = 5;
 WT.gwidth   = 3;
-WT.freq     = TF.frang(1):1:TF.frang(2);
+WT.freq     = TF.frange(1):1:TF.frange(2);
+if WT.freq(1)==0, WT.freq(1) = []; end      % 0이 포함된 경우 제거, Wavelet은 0값이 없음.
 WT.time     = (0:20:(msTime-1/Fs))*0.001;
 WT.fs       = 1/(WT.time(2)-WT.time(1));
 WT.nFr         = length(WT.freq);
 WT.nTm         = length(WT.time);
 
 save([REP_DIR 'WT.mat'], 'WT')
+
+tempWav =  cell(1, 6);  % 각 데이터별 값 임시 저장
+wPwr256 = cell(0,6);    % 전체 데이터 값 저장
+
+for p = 1:pSize(1)
+    if Sinfo(p, iDO), continue, end
+    
+    cLimit = Sinfo(p,iHav);
+    if cLimit == 0, qLimit = 5;
+    else qLimit = cLimit - 1; end
+    
+    % pID 피험자 ID, pSym 질환 증상, pGen 성별, pAge 나이
+    pID = Sinfo(p,iID); pSym = Sinfo(p,iSym); pGen = Sinfo(p,iGen); pAge = Sinfo(p,iAge);
+    
+    % 실험 프로토콜이 바뀌기 전까지 qLimit 표시까지만, qLimit 부터는 2048Hz
+    for q = 1:qLimit
+        % 방문 횟수 pVst
+        pVst = q;
+        dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
+        
+        % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
+        % E003-1은 혼자 데이터 길이가 감, E004-1은 2번 채널이 없음
+        % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
+        if strcmp(dPath, 'E003-1'), continue, end
+        if strcmp(dPath, 'E004-1'), continue, end
+        if ~Sinfo(p,iAge+q), continue, end        
+    
+        disp(dPath);
+        Wav = GetWav256(dPath, nCh, WT);
+        tempWav(1,1:6) = {pID, pSym, pGen, pAge, pVst, Wav};
+        save([REP_DIR dPath '_Wav' '.mat'], 'Wav')
+        
+        wPwr256 = cat(1, wPwr256, tempWav);
+    end
+end
+save([REP_DIR 'wPwr256.mat'], 'wPwr256', '-v7.3')
 
 
 %% 각 Raw Power 마다 Band 별 Sperctarl Power 계산
