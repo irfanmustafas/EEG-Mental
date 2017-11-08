@@ -98,6 +98,9 @@ pwr256 = cell(0,6);
 %         if ~Sinfo(p,iAge+q), continue, end        
 %     
 %         disp(dPath);
+%         % Pwr 구조는 nCh(2) x nFr(28: 0~54 2간격) x nTm (19144)
+%         % 25/256 = 0.0977초 간격, 윈도우 크기 TF.tShift를 0.1로 정했으니
+%         % 1870초의 약 10 배(256/25 = 10.24배) 좀 더 된 19144 크기가 됨
 %         Pwr = GetPwr256(dPath, nCh, TF);
 %         tempPwr(1,1:6) = {pID, pSym, pGen, pAge, pVst, Pwr};
 %         save([REP_DIR dPath '_Pwr' '.mat'], 'Pwr')
@@ -151,6 +154,7 @@ for p = 1:pSize(1)
         if ~Sinfo(p,iAge+q), continue, end        
     
         disp(dPath);
+        % Wav 구조는 nCh(2) x nFr(55: 1~55) x nTm (93500, 0.02초 간격 1870초)
         Wav = GetWav256(dPath, nCh, WT);
         tempWav(1,1:6) = {pID, pSym, pGen, pAge, pVst, Wav};
         save([REP_DIR dPath '_Wav' '.mat'], 'Wav')
