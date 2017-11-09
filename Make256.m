@@ -323,7 +323,8 @@ end
 % bTable = zeros(2,48);
 
 % 값 확인을 위해 일단 채널 2개만 먼저 해보고 채널 차이는 나중에 해보기로
-pTable = zeros(1,101);       % 96 + 5;
+pTable = zeros(1,101);      % 96 + 5;
+tTable256 = zeros(0,101);      % 전체 피험자 저장용
 
 for p = 1:pSize(1)
     if Sinfo(p, iDO), continue, end
@@ -520,5 +521,10 @@ for p = 1:pSize(1)
             pTable(99) = dtF6(2);
             pTable(100) = dtF7(2);
             pTable(101) = dtF8(2);
+            
+        % 전체 변수에 누적 저장
+            tTable256 = cat(1, tTable256, pTable);
     end
+    
+    save([REP_DIR 'tTable256.mat'], 'tTable256', '-v7.3')
 end
