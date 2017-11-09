@@ -528,3 +528,5 @@ for p = 1:pSize(1)
     
     save([REP_DIR 'tTable256.mat'], 'tTable256', '-v7.3')
 end
+
+% xlswrite('tTable256.xlsx', tTable256)
