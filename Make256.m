@@ -316,9 +316,10 @@ for t = 1:length(tStart1)
 end
 
 % 각 피험자별 파일 읽어온 후에 계산
-% 총 Feature 수: Feature 구간 8개 X Band 구간 6개 = 48개
+% 총 Feature 수: Channel 수 3개 X Feature 구간 8개 X Band 구간 6개 = 144개
+% Channel은 원래 2개 이지만 Channel1 - Channel2 뺀 차이도 기록
 % 피험자 기본 정보 5개
-pTable = zeros(1,53);       % 48 + 5;
+pTable = zeros(1,149);       % 144 + 5;
 
 for p = 1:pSize(1)
     if Sinfo(p, iDO), continue, end
