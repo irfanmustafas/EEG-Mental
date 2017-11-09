@@ -119,9 +119,9 @@ msTime = TF.lines/TF.Fs*1000;
 WT.width    = 5;
 WT.gwidth   = 3;
 WT.freq     = TF.frange(1):1:TF.frange(2);
-if WT.freq(1)==0, WT.freq(1) = []; end      % 0이 포함된 경우 제거, Wavelet은 0값이 없음.
-WT.time     = (0:20:(msTime-1/Fs))*0.001;
-WT.fs       = 1/(WT.time(2)-WT.time(1));
+if WT.freq(1) == 0, WT.freq(1) = []; end    % 범위에 0이 포함된 경우 제거, Wavelet은 0값 의미 없음
+WT.time     = (0:20:(msTime-1/Fs))*0.001;   % 0.02초 간격 설정
+WT.fs       = 1/(WT.time(2)-WT.time(1));    % 위에서 간격이 0.02초로 fs는 50됨
 WT.nFr         = length(WT.freq);
 WT.nTm         = length(WT.time);
 
