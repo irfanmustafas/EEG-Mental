@@ -323,7 +323,9 @@ end
 % bTable = zeros(2,48);
 
 % 값 확인을 위해 일단 채널 2개만 먼저 해보고 채널 차이는 나중에 해보기로
-pTable = zeros(1,101);      % 96 + 5;
+% 다시보니 Feature 자극 6개별로 구해야 해서 6배 되어야 함
+% 총 Feature 수: Channel 수 2개 X 자극 6개 X Feature 구간 8개 X Band 구간 6개 = 864개
+pTable = zeros(1,101);      % 864 + 5;
 tTable256 = zeros(0,101);      % 전체 피험자 저장용
 
 for p = 1:pSize(1)
@@ -356,6 +358,7 @@ for p = 1:pSize(1)
         pTable(1:5) = cell2mat(gmWav(1:5));
         
         % band 별 Feature 얻기, 2채널 정보로 넘어옴.
+        % 자극 구간 6개 별로 더 만들어야함, 지금은 6번 계산 후 마지막 자극만 쌓이는 것.
         for t = 1:sm(2)
             gmF1 = nanmean(gmWav{6}(:,iStart1(t):i3End1(t)), 2);
             gmF2 = nanmean(gmWav{6}(:,iStart1(t):i5End1(t)), 2);
@@ -413,6 +416,7 @@ for p = 1:pSize(1)
         end
         
         % CH1 정보
+        % 자극 갯수 반영하려면 6배로 늘어야 함
             pTable(6) = gmF1(1);
             pTable(7) = gmF2(1);
             pTable(8) = gmF3(1);
