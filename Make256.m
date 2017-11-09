@@ -310,12 +310,16 @@ for t = 1:length(tStart1)
    [~,iStart3(t)]   = min(abs(WT.time-tStart3(t)));
    [~,i3End3(t)]    = min(abs(WT.time-t3End3(t)));
    [~,i5End3(t)]    = min(abs(WT.time-t5End3(t)));
-   [~,iStartM(t)]    = min(abs(WT.time-tStartM(t)));
-   [~,iEndM(t)]    = min(abs(WT.time-tEndM(t)));
+   [~,iStartM(t)]   = min(abs(WT.time-tStartM(t)));
+   [~,iEndM(t)]     = min(abs(WT.time-tEndM(t)));
    [~,iEnd(t)]      = min(abs(WT.time-tEnd(t)));
 end
 
 % 각 피험자별 파일 읽어온 후에 계산
+% 총 Feature 수: Feature 구간 8개 X Band 구간 6개 = 48개
+% 피험자 기본 정보 5개
+pTable = zeros(1,53);       % 48 + 5;
+
 for p = 1:pSize(1)
     if Sinfo(p, iDO), continue, end
     
@@ -325,8 +329,6 @@ for p = 1:pSize(1)
  
     % 실험 프로토콜이 바뀌기 전까지 qLimit 표시까지만, qLimit 부터는 2048Hz
     for q = 1:qLimit
-        % 방문 횟수 pVst
-        pVst = q;
         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
         
         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
@@ -337,11 +339,16 @@ for p = 1:pSize(1)
         if ~Sinfo(p,iAge+q), continue, end        
     
         disp(dPath);
-%         load([REP_DIR dPath '_gmWav' '.mat'])
-%         load([REP_DIR dPath '_muWav' '.mat'])
-%         load([REP_DIR dPath '_apWav' '.mat'])
-%         load([REP_DIR dPath '_btWav' '.mat'])
-%         load([REP_DIR dPath '_thWav' '.mat'])
-%         load([REP_DIR dPath '_dtWav' '.mat'])
+        load([REP_DIR dPath '_gmWav' '.mat'])
+        load([REP_DIR dPath '_muWav' '.mat'])
+        load([REP_DIR dPath '_apWav' '.mat'])
+        load([REP_DIR dPath '_btWav' '.mat'])
+        load([REP_DIR dPath '_thWav' '.mat'])
+        load([REP_DIR dPath '_dtWav' '.mat'])
+        
+        % 피험자 기본 정보 5개 옮기기
+        pTable(1:5) = cell2mat(apWav(1:5));
+        
+        
     end
 end
