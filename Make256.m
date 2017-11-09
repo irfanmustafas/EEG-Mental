@@ -268,6 +268,9 @@ pwr256 = cell(0,6);
 %% 자극 구간 설정 후 각 Band별 값
 load([REP_DIR 'WT.mat'])
 
+% Feature 구간 8개:
+% (1) 처음 3초 / (2) 처음 5초 / (3) 60초 후 3초 / (4) 60초 후 5초
+% (5) 120초 후 3초 / (6) 120초 후 5초 / (7) 중간 100초 / (8) 전체 300초
 tStart1 = [10 320 630 940 1250 1570];
 t3End1  = tStart1 + 3;
 t5End1  = tStart1 + 5;
@@ -277,7 +280,11 @@ t5End2  = tStart2 + 5;
 tStart3 = tStart1 + 120;
 t3End3  = tStart3 + 3;
 t5End3  = tStart3 + 5;
+tStartM = tStart1 + 100;
+tEndM = tStart1 + 200;
+tEnd    = tStart1 + 300;
 
+% 실제 변환된 주소(index) 저장 변수 지정
 sm = size(tStart1);
 iStart1 = zeros(sm);
 i3End1  = zeros(sm);
@@ -288,7 +295,11 @@ i5End2  = zeros(sm);
 iStart3 = zeros(sm);
 i3End3  = zeros(sm);
 i5End3  = zeros(sm);
+iStartM = zeros(sm);
+iEndM   = zeros(sm);
+iEnd    = zeros(sm);
 
+% 시간 구간을 주소 값으로 변환
 for t = 1:length(tStart1)
    [~,iStart1(t)]   = min(abs(WT.time-tStart1(t)));
    [~,i3End1(t)]    = min(abs(WT.time-t3End1(t)));
@@ -299,5 +310,38 @@ for t = 1:length(tStart1)
    [~,iStart3(t)]   = min(abs(WT.time-tStart3(t)));
    [~,i3End3(t)]    = min(abs(WT.time-t3End3(t)));
    [~,i5End3(t)]    = min(abs(WT.time-t5End3(t)));
+   [~,iStartM(t)]    = min(abs(WT.time-tStartM(t)));
+   [~,iEndM(t)]    = min(abs(WT.time-tEndM(t)));
+   [~,iEnd(t)]      = min(abs(WT.time-tEnd(t)));
 end
 
+% 각 피험자별 파일 읽어온 후에 계산
+for p = 1:pSize(1)
+    if Sinfo(p, iDO), continue, end
+    
+    cLimit = Sinfo(p,iHav);
+    if cLimit == 0, qLimit = 5;
+    else qLimit = cLimit - 1; end
+ 
+    % 실험 프로토콜이 바뀌기 전까지 qLimit 표시까지만, qLimit 부터는 2048Hz
+    for q = 1:qLimit
+        % 방문 횟수 pVst
+        pVst = q;
+        dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
+        
+        % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
+        % E003-1은 혼자 데이터 길이가 감, E004-1은 2번 채널이 없음
+        % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
+        if strcmp(dPath, 'E003-1'), continue, end
+        if strcmp(dPath, 'E004-1'), continue, end
+        if ~Sinfo(p,iAge+q), continue, end        
+    
+        disp(dPath);
+%         load([REP_DIR dPath '_gmWav' '.mat'])
+%         load([REP_DIR dPath '_muWav' '.mat'])
+%         load([REP_DIR dPath '_apWav' '.mat'])
+%         load([REP_DIR dPath '_btWav' '.mat'])
+%         load([REP_DIR dPath '_thWav' '.mat'])
+%         load([REP_DIR dPath '_dtWav' '.mat'])
+    end
+end
