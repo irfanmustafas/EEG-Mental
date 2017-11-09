@@ -300,7 +300,7 @@ iEndM   = zeros(sm);
 iEnd    = zeros(sm);
 
 % 시간 구간을 주소 값으로 변환
-for t = 1:length(tStart1)
+for t = 1:sm(2)
    [~,iStart1(t)]   = min(abs(WT.time-tStart1(t)));
    [~,i3End1(t)]    = min(abs(WT.time-t3End1(t)));
    [~,i5End1(t)]    = min(abs(WT.time-t5End1(t)));
@@ -348,8 +348,62 @@ for p = 1:pSize(1)
         load([REP_DIR dPath '_dtWav' '.mat'])
         
         % 피험자 기본 정보 5개 옮기기
-        pTable(1:5) = cell2mat(apWav(1:5));
+        pTable(1:5) = cell2mat(gmWav(1:5));
         
-        
+        for t = 1:sm(2)
+            gmF1 = nanmean(gmWav{6}(:,iStart1(t):i3End1(t)), 2);
+            gmF2 = nanmean(gmWav{6}(:,iStart1(t):i5End1(t)), 2);
+            gmF3 = nanmean(gmWav{6}(:,iStart2(t):i3End2(t)), 2);
+            gmF4 = nanmean(gmWav{6}(:,iStart2(t):i5End2(t)), 2);
+            gmF5 = nanmean(gmWav{6}(:,iStart3(t):i3End3(t)), 2);
+            gmF6 = nanmean(gmWav{6}(:,iStart3(t):i5End3(t)), 2);
+            gmF7 = nanmean(gmWav{6}(:,iStartM(t):iEndM(t)), 2);
+            gmF8 = nanmean(gmWav{6}(:,iStart1(t):iEnd(t)), 2);
+            
+            muF1 = nanmean(muWav{6}(:,iStart1(t):i3End1(t)), 2);
+            muF2 = nanmean(muWav{6}(:,iStart1(t):i5End1(t)), 2);
+            muF3 = nanmean(muWav{6}(:,iStart2(t):i3End2(t)), 2);
+            muF4 = nanmean(muWav{6}(:,iStart2(t):i5End2(t)), 2);
+            muF5 = nanmean(muWav{6}(:,iStart3(t):i3End3(t)), 2);
+            muF6 = nanmean(muWav{6}(:,iStart3(t):i5End3(t)), 2);
+            muF7 = nanmean(muWav{6}(:,iStartM(t):iEndM(t)), 2);
+            muF8 = nanmean(muWav{6}(:,iStart1(t):iEnd(t)), 2);
+            
+            apF1 = nanmean(apWav{6}(:,iStart1(t):i3End1(t)), 2);
+            apF2 = nanmean(apWav{6}(:,iStart1(t):i5End1(t)), 2);
+            apF3 = nanmean(apWav{6}(:,iStart2(t):i3End2(t)), 2);
+            apF4 = nanmean(apWav{6}(:,iStart2(t):i5End2(t)), 2);
+            apF5 = nanmean(apWav{6}(:,iStart3(t):i3End3(t)), 2);
+            apF6 = nanmean(apWav{6}(:,iStart3(t):i5End3(t)), 2);
+            apF7 = nanmean(apWav{6}(:,iStartM(t):iEndM(t)), 2);
+            apF8 = nanmean(apWav{6}(:,iStart1(t):iEnd(t)), 2);
+            
+            btF1 = nanmean(btWav{6}(:,iStart1(t):i3End1(t)), 2);
+            btF2 = nanmean(btWav{6}(:,iStart1(t):i5End1(t)), 2);
+            btF3 = nanmean(btWav{6}(:,iStart2(t):i3End2(t)), 2);
+            btF4 = nanmean(btWav{6}(:,iStart2(t):i5End2(t)), 2);
+            btF5 = nanmean(btWav{6}(:,iStart3(t):i3End3(t)), 2);
+            btF6 = nanmean(btWav{6}(:,iStart3(t):i5End3(t)), 2);
+            btF7 = nanmean(btWav{6}(:,iStartM(t):iEndM(t)), 2);
+            btF8 = nanmean(btWav{6}(:,iStart1(t):iEnd(t)), 2);
+            
+            thF1 = nanmean(thWav{6}(:,iStart1(t):i3End1(t)), 2);
+            thF2 = nanmean(thWav{6}(:,iStart1(t):i5End1(t)), 2);
+            thF3 = nanmean(thWav{6}(:,iStart2(t):i3End2(t)), 2);
+            thF4 = nanmean(thWav{6}(:,iStart2(t):i5End2(t)), 2);
+            thF5 = nanmean(thWav{6}(:,iStart3(t):i3End3(t)), 2);
+            thF6 = nanmean(thWav{6}(:,iStart3(t):i5End3(t)), 2);
+            thF7 = nanmean(thWav{6}(:,iStartM(t):iEndM(t)), 2);
+            thF8 = nanmean(thWav{6}(:,iStart1(t):iEnd(t)), 2);
+            
+            dtF1 = nanmean(dtWav{6}(:,iStart1(t):i3End1(t)), 2);
+            dtF2 = nanmean(dtWav{6}(:,iStart1(t):i5End1(t)), 2);
+            dtF3 = nanmean(dtWav{6}(:,iStart2(t):i3End2(t)), 2);
+            dtF4 = nanmean(dtWav{6}(:,iStart2(t):i5End2(t)), 2);
+            dtF5 = nanmean(dtWav{6}(:,iStart3(t):i3End3(t)), 2);
+            dtF6 = nanmean(dtWav{6}(:,iStart3(t):i5End3(t)), 2);
+            dtF7 = nanmean(dtWav{6}(:,iStartM(t):iEndM(t)), 2);
+            dtF8 = nanmean(dtWav{6}(:,iStart1(t):iEnd(t)), 2);
+        end
     end
 end
