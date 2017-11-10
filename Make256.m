@@ -432,116 +432,116 @@ for p = 1:pSize(1)
             end
         end
         
-        % CH1 정보
-        % 자극 갯수 반영하려면 6배로 늘어야 함
-            pTable(6) = gmF1(1);
-            pTable(7) = gmF2(1);
-            pTable(8) = gmF3(1);
-            pTable(9) = gmF4(1);
-            pTable(10) = gmF5(1);
-            pTable(11) = gmF6(1);
-            pTable(12) = gmF7(1);
-            pTable(13) = gmF8(1);
-            
-            pTable(14) = muF1(1);
-            pTable(15) = muF2(1);
-            pTable(16) = muF3(1);
-            pTable(17) = muF4(1);
-            pTable(18) = muF5(1);
-            pTable(19) = muF6(1);
-            pTable(20) = muF7(1);
-            pTable(21) = muF8(1);
-            
-            pTable(22) = apF1(1);
-            pTable(23) = apF2(1);
-            pTable(24) = apF3(1);
-            pTable(25) = apF4(1);
-            pTable(26) = apF5(1);
-            pTable(27) = apF6(1);
-            pTable(28) = apF7(1);
-            pTable(29) = apF8(1);
-            
-            pTable(30) = btF1(1);
-            pTable(31) = btF2(1);
-            pTable(32) = btF3(1);
-            pTable(33) = btF4(1);
-            pTable(34) = btF5(1);
-            pTable(35) = btF6(1);
-            pTable(36) = btF7(1);
-            pTable(37) = btF8(1);
-            
-            pTable(38) = thF1(1);
-            pTable(39) = thF2(1);
-            pTable(40) = thF3(1);
-            pTable(41) = thF4(1);
-            pTable(42) = thF5(1);
-            pTable(43) = thF6(1);
-            pTable(44) = thF7(1);
-            pTable(45) = thF8(1);
-            
-            pTable(46) = dtF1(1);
-            pTable(47) = dtF2(1);
-            pTable(48) = dtF3(1);
-            pTable(49) = dtF4(1);
-            pTable(50) = dtF5(1);
-            pTable(51) = dtF6(1);
-            pTable(52) = dtF7(1);
-            pTable(53) = dtF8(1);
-            
-        % CH2 정보
-            pTable(54) = gmF1(2);
-            pTable(55) = gmF2(2);
-            pTable(56) = gmF3(2);
-            pTable(57) = gmF4(2);
-            pTable(58) = gmF5(2);
-            pTable(59) = gmF6(2);
-            pTable(60) = gmF7(2);
-            pTable(61) = gmF8(2);
-            
-            pTable(62) = muF1(2);
-            pTable(63) = muF2(2);
-            pTable(64) = muF3(2);
-            pTable(65) = muF4(2);
-            pTable(66) = muF5(2);
-            pTable(67) = muF6(2);
-            pTable(68) = muF7(2);
-            pTable(69) = muF8(2);
-            
-            pTable(70) = apF1(2);
-            pTable(71) = apF2(2);
-            pTable(72) = apF3(2);
-            pTable(73) = apF4(2);
-            pTable(74) = apF5(2);
-            pTable(75) = apF6(2);
-            pTable(76) = apF7(2);
-            pTable(77) = apF8(2);
-            
-            pTable(78) = btF1(2);
-            pTable(79) = btF2(2);
-            pTable(80) = btF3(2);
-            pTable(81) = btF4(2);
-            pTable(82) = btF5(2);
-            pTable(83) = btF6(2);
-            pTable(84) = btF7(2);
-            pTable(85) = btF8(2);
-            
-            pTable(86) = thF1(2);
-            pTable(87) = thF2(2);
-            pTable(88) = thF3(2);
-            pTable(89) = thF4(2);
-            pTable(90) = thF5(2);
-            pTable(91) = thF6(2);
-            pTable(92) = thF7(2);
-            pTable(93) = thF8(2);
-            
-            pTable(94) = dtF1(2);
-            pTable(95) = dtF2(2);
-            pTable(96) = dtF3(2);
-            pTable(97) = dtF4(2);
-            pTable(98) = dtF5(2);
-            pTable(99) = dtF6(2);
-            pTable(100) = dtF7(2);
-            pTable(101) = dtF8(2);
+%         % CH1 정보
+%         % 자극 갯수 반영하려면 6배로 늘어야 함
+%             pTable(6) = gmF1(1);
+%             pTable(7) = gmF2(1);
+%             pTable(8) = gmF3(1);
+%             pTable(9) = gmF4(1);
+%             pTable(10) = gmF5(1);
+%             pTable(11) = gmF6(1);
+%             pTable(12) = gmF7(1);
+%             pTable(13) = gmF8(1);
+%             
+%             pTable(14) = muF1(1);
+%             pTable(15) = muF2(1);
+%             pTable(16) = muF3(1);
+%             pTable(17) = muF4(1);
+%             pTable(18) = muF5(1);
+%             pTable(19) = muF6(1);
+%             pTable(20) = muF7(1);
+%             pTable(21) = muF8(1);
+%             
+%             pTable(22) = apF1(1);
+%             pTable(23) = apF2(1);
+%             pTable(24) = apF3(1);
+%             pTable(25) = apF4(1);
+%             pTable(26) = apF5(1);
+%             pTable(27) = apF6(1);
+%             pTable(28) = apF7(1);
+%             pTable(29) = apF8(1);
+%             
+%             pTable(30) = btF1(1);
+%             pTable(31) = btF2(1);
+%             pTable(32) = btF3(1);
+%             pTable(33) = btF4(1);
+%             pTable(34) = btF5(1);
+%             pTable(35) = btF6(1);
+%             pTable(36) = btF7(1);
+%             pTable(37) = btF8(1);
+%             
+%             pTable(38) = thF1(1);
+%             pTable(39) = thF2(1);
+%             pTable(40) = thF3(1);
+%             pTable(41) = thF4(1);
+%             pTable(42) = thF5(1);
+%             pTable(43) = thF6(1);
+%             pTable(44) = thF7(1);
+%             pTable(45) = thF8(1);
+%             
+%             pTable(46) = dtF1(1);
+%             pTable(47) = dtF2(1);
+%             pTable(48) = dtF3(1);
+%             pTable(49) = dtF4(1);
+%             pTable(50) = dtF5(1);
+%             pTable(51) = dtF6(1);
+%             pTable(52) = dtF7(1);
+%             pTable(53) = dtF8(1);
+%             
+%         % CH2 정보
+%             pTable(54) = gmF1(2);
+%             pTable(55) = gmF2(2);
+%             pTable(56) = gmF3(2);
+%             pTable(57) = gmF4(2);
+%             pTable(58) = gmF5(2);
+%             pTable(59) = gmF6(2);
+%             pTable(60) = gmF7(2);
+%             pTable(61) = gmF8(2);
+%             
+%             pTable(62) = muF1(2);
+%             pTable(63) = muF2(2);
+%             pTable(64) = muF3(2);
+%             pTable(65) = muF4(2);
+%             pTable(66) = muF5(2);
+%             pTable(67) = muF6(2);
+%             pTable(68) = muF7(2);
+%             pTable(69) = muF8(2);
+%             
+%             pTable(70) = apF1(2);
+%             pTable(71) = apF2(2);
+%             pTable(72) = apF3(2);
+%             pTable(73) = apF4(2);
+%             pTable(74) = apF5(2);
+%             pTable(75) = apF6(2);
+%             pTable(76) = apF7(2);
+%             pTable(77) = apF8(2);
+%             
+%             pTable(78) = btF1(2);
+%             pTable(79) = btF2(2);
+%             pTable(80) = btF3(2);
+%             pTable(81) = btF4(2);
+%             pTable(82) = btF5(2);
+%             pTable(83) = btF6(2);
+%             pTable(84) = btF7(2);
+%             pTable(85) = btF8(2);
+%             
+%             pTable(86) = thF1(2);
+%             pTable(87) = thF2(2);
+%             pTable(88) = thF3(2);
+%             pTable(89) = thF4(2);
+%             pTable(90) = thF5(2);
+%             pTable(91) = thF6(2);
+%             pTable(92) = thF7(2);
+%             pTable(93) = thF8(2);
+%             
+%             pTable(94) = dtF1(2);
+%             pTable(95) = dtF2(2);
+%             pTable(96) = dtF3(2);
+%             pTable(97) = dtF4(2);
+%             pTable(98) = dtF5(2);
+%             pTable(99) = dtF6(2);
+%             pTable(100) = dtF7(2);
+%             pTable(101) = dtF8(2);
             
         % 전체 변수에 누적 저장
             tTable256 = cat(1, tTable256, pTable);
