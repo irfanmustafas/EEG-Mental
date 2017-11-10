@@ -316,17 +316,13 @@ for t = 1:sm(2)
 end
 
 % 각 피험자별 파일 읽어온 후에 계산
-% 총 Feature 수: Channel 수 3개 X Feature 구간 8개 X Band 구간 6개 = 144개
-% Channel은 원래 2개 이지만 Channel1 - Channel2 뺀 차이도 기록
-% 피험자 기본 정보 5개
-% pTable = zeros(1,149);       % 144 + 5;
-% bTable = zeros(2,48);
-
+% 총 Feature 수: Channel 수 2개 X 자극 6개 X Band 구간 6개 X Feature 구간 8개 = 576개
+% Channel은 원래 2개 이지만 Channel1 - Channel2 뺀 차이도 기록해볼 의미 있음
 % 값 확인을 위해 일단 채널 2개만 먼저 해보고 채널 차이는 나중에 해보기로
-% 다시보니 Feature 자극 6개별로 구해야 해서 6배 되어야 함
-% 총 Feature 수: Channel 수 2개 X 자극 6개 X Feature 구간 8개 X Band 구간 6개 = 576개
-pTable = zeros(1,101);      % 576 + 5;
-tTable256 = zeros(0,101);      % 전체 피험자 저장용
+pN = 5; cN = 2; sN = 6; bN = 6; fN = 8;
+pMatrix = zeros(cN, sN, bN, fN);
+pTable = zeros(1,581);      % 576 + 5;
+tTable256 = zeros(0,581);      % 전체 피험자 저장용
 
 for p = 1:pSize(1)
     if Sinfo(p, iDO), continue, end
@@ -360,59 +356,80 @@ for p = 1:pSize(1)
         % band 별 Feature 얻기, 2채널 정보로 넘어옴.
         % 자극 구간 6개 별로 더 만들어야함, 지금은 6번 계산 후 마지막 자극만 쌓이는 것.
         for t = 1:sm(2)
-            gmF1 = nanmean(gmWav{6}(:,iStart1(t):i3End1(t)), 2);
-            gmF2 = nanmean(gmWav{6}(:,iStart1(t):i5End1(t)), 2);
-            gmF3 = nanmean(gmWav{6}(:,iStart2(t):i3End2(t)), 2);
-            gmF4 = nanmean(gmWav{6}(:,iStart2(t):i5End2(t)), 2);
-            gmF5 = nanmean(gmWav{6}(:,iStart3(t):i3End3(t)), 2);
-            gmF6 = nanmean(gmWav{6}(:,iStart3(t):i5End3(t)), 2);
-            gmF7 = nanmean(gmWav{6}(:,iStartM(t):iEndM(t)), 2);
-            gmF8 = nanmean(gmWav{6}(:,iStart1(t):iEnd(t)), 2);
+            pMatrix(:,t,1,1) = nanmean(gmWav{6}(:,iStart1(t):i3End1(t)), 2);
+            pMatrix(:,t,1,2) = nanmean(gmWav{6}(:,iStart1(t):i5End1(t)), 2);
+            pMatrix(:,t,1,3) = nanmean(gmWav{6}(:,iStart2(t):i3End2(t)), 2);
+            pMatrix(:,t,1,4) = nanmean(gmWav{6}(:,iStart2(t):i5End2(t)), 2);
+            pMatrix(:,t,1,5) = nanmean(gmWav{6}(:,iStart3(t):i3End3(t)), 2);
+            pMatrix(:,t,1,6) = nanmean(gmWav{6}(:,iStart3(t):i5End3(t)), 2);
+            pMatrix(:,t,1,7) = nanmean(gmWav{6}(:,iStartM(t):iEndM(t)), 2);
+            pMatrix(:,t,1,8) = nanmean(gmWav{6}(:,iStart1(t):iEnd(t)), 2);
             
-            muF1 = nanmean(muWav{6}(:,iStart1(t):i3End1(t)), 2);
-            muF2 = nanmean(muWav{6}(:,iStart1(t):i5End1(t)), 2);
-            muF3 = nanmean(muWav{6}(:,iStart2(t):i3End2(t)), 2);
-            muF4 = nanmean(muWav{6}(:,iStart2(t):i5End2(t)), 2);
-            muF5 = nanmean(muWav{6}(:,iStart3(t):i3End3(t)), 2);
-            muF6 = nanmean(muWav{6}(:,iStart3(t):i5End3(t)), 2);
-            muF7 = nanmean(muWav{6}(:,iStartM(t):iEndM(t)), 2);
-            muF8 = nanmean(muWav{6}(:,iStart1(t):iEnd(t)), 2);
+            pMatrix(:,t,2,1) = nanmean(muWav{6}(:,iStart1(t):i3End1(t)), 2);
+            pMatrix(:,t,2,2) = nanmean(muWav{6}(:,iStart1(t):i5End1(t)), 2);
+            pMatrix(:,t,2,3) = nanmean(muWav{6}(:,iStart2(t):i3End2(t)), 2);
+            pMatrix(:,t,2,4) = nanmean(muWav{6}(:,iStart2(t):i5End2(t)), 2);
+            pMatrix(:,t,2,5) = nanmean(muWav{6}(:,iStart3(t):i3End3(t)), 2);
+            pMatrix(:,t,2,6) = nanmean(muWav{6}(:,iStart3(t):i5End3(t)), 2);
+            pMatrix(:,t,2,7) = nanmean(muWav{6}(:,iStartM(t):iEndM(t)), 2);
+            pMatrix(:,t,2,8) = nanmean(muWav{6}(:,iStart1(t):iEnd(t)), 2);
             
-            apF1 = nanmean(apWav{6}(:,iStart1(t):i3End1(t)), 2);
-            apF2 = nanmean(apWav{6}(:,iStart1(t):i5End1(t)), 2);
-            apF3 = nanmean(apWav{6}(:,iStart2(t):i3End2(t)), 2);
-            apF4 = nanmean(apWav{6}(:,iStart2(t):i5End2(t)), 2);
-            apF5 = nanmean(apWav{6}(:,iStart3(t):i3End3(t)), 2);
-            apF6 = nanmean(apWav{6}(:,iStart3(t):i5End3(t)), 2);
-            apF7 = nanmean(apWav{6}(:,iStartM(t):iEndM(t)), 2);
-            apF8 = nanmean(apWav{6}(:,iStart1(t):iEnd(t)), 2);
+            pMatrix(:,t,3,1) = nanmean(apWav{6}(:,iStart1(t):i3End1(t)), 2);
+            pMatrix(:,t,3,2) = nanmean(apWav{6}(:,iStart1(t):i5End1(t)), 2);
+            pMatrix(:,t,3,3) = nanmean(apWav{6}(:,iStart2(t):i3End2(t)), 2);
+            pMatrix(:,t,3,4) = nanmean(apWav{6}(:,iStart2(t):i5End2(t)), 2);
+            pMatrix(:,t,3,5) = nanmean(apWav{6}(:,iStart3(t):i3End3(t)), 2);
+            pMatrix(:,t,3,6) = nanmean(apWav{6}(:,iStart3(t):i5End3(t)), 2);
+            pMatrix(:,t,3,7) = nanmean(apWav{6}(:,iStartM(t):iEndM(t)), 2);
+            pMatrix(:,t,3,8) = nanmean(apWav{6}(:,iStart1(t):iEnd(t)), 2);
             
-            btF1 = nanmean(btWav{6}(:,iStart1(t):i3End1(t)), 2);
-            btF2 = nanmean(btWav{6}(:,iStart1(t):i5End1(t)), 2);
-            btF3 = nanmean(btWav{6}(:,iStart2(t):i3End2(t)), 2);
-            btF4 = nanmean(btWav{6}(:,iStart2(t):i5End2(t)), 2);
-            btF5 = nanmean(btWav{6}(:,iStart3(t):i3End3(t)), 2);
-            btF6 = nanmean(btWav{6}(:,iStart3(t):i5End3(t)), 2);
-            btF7 = nanmean(btWav{6}(:,iStartM(t):iEndM(t)), 2);
-            btF8 = nanmean(btWav{6}(:,iStart1(t):iEnd(t)), 2);
+            pMatrix(:,t,4,1) = nanmean(btWav{6}(:,iStart1(t):i3End1(t)), 2);
+            pMatrix(:,t,4,2) = nanmean(btWav{6}(:,iStart1(t):i5End1(t)), 2);
+            pMatrix(:,t,4,3) = nanmean(btWav{6}(:,iStart2(t):i3End2(t)), 2);
+            pMatrix(:,t,4,4) = nanmean(btWav{6}(:,iStart2(t):i5End2(t)), 2);
+            pMatrix(:,t,4,5) = nanmean(btWav{6}(:,iStart3(t):i3End3(t)), 2);
+            pMatrix(:,t,4,6) = nanmean(btWav{6}(:,iStart3(t):i5End3(t)), 2);
+            pMatrix(:,t,4,7) = nanmean(btWav{6}(:,iStartM(t):iEndM(t)), 2);
+            pMatrix(:,t,4,8) = nanmean(btWav{6}(:,iStart1(t):iEnd(t)), 2);
             
-            thF1 = nanmean(thWav{6}(:,iStart1(t):i3End1(t)), 2);
-            thF2 = nanmean(thWav{6}(:,iStart1(t):i5End1(t)), 2);
-            thF3 = nanmean(thWav{6}(:,iStart2(t):i3End2(t)), 2);
-            thF4 = nanmean(thWav{6}(:,iStart2(t):i5End2(t)), 2);
-            thF5 = nanmean(thWav{6}(:,iStart3(t):i3End3(t)), 2);
-            thF6 = nanmean(thWav{6}(:,iStart3(t):i5End3(t)), 2);
-            thF7 = nanmean(thWav{6}(:,iStartM(t):iEndM(t)), 2);
-            thF8 = nanmean(thWav{6}(:,iStart1(t):iEnd(t)), 2);
+            pMatrix(:,t,5,1) = nanmean(thWav{6}(:,iStart1(t):i3End1(t)), 2);
+            pMatrix(:,t,5,2) = nanmean(thWav{6}(:,iStart1(t):i5End1(t)), 2);
+            pMatrix(:,t,5,3) = nanmean(thWav{6}(:,iStart2(t):i3End2(t)), 2);
+            pMatrix(:,t,5,4) = nanmean(thWav{6}(:,iStart2(t):i5End2(t)), 2);
+            pMatrix(:,t,5,5) = nanmean(thWav{6}(:,iStart3(t):i3End3(t)), 2);
+            pMatrix(:,t,5,6) = nanmean(thWav{6}(:,iStart3(t):i5End3(t)), 2);
+            pMatrix(:,t,5,7) = nanmean(thWav{6}(:,iStartM(t):iEndM(t)), 2);
+            pMatrix(:,t,5,8) = nanmean(thWav{6}(:,iStart1(t):iEnd(t)), 2);
             
-            dtF1 = nanmean(dtWav{6}(:,iStart1(t):i3End1(t)), 2);
-            dtF2 = nanmean(dtWav{6}(:,iStart1(t):i5End1(t)), 2);
-            dtF3 = nanmean(dtWav{6}(:,iStart2(t):i3End2(t)), 2);
-            dtF4 = nanmean(dtWav{6}(:,iStart2(t):i5End2(t)), 2);
-            dtF5 = nanmean(dtWav{6}(:,iStart3(t):i3End3(t)), 2);
-            dtF6 = nanmean(dtWav{6}(:,iStart3(t):i5End3(t)), 2);
-            dtF7 = nanmean(dtWav{6}(:,iStartM(t):iEndM(t)), 2);
-            dtF8 = nanmean(dtWav{6}(:,iStart1(t):iEnd(t)), 2);
+            pMatrix(:,t,6,1) = nanmean(dtWav{6}(:,iStart1(t):i3End1(t)), 2);
+            pMatrix(:,t,6,2) = nanmean(dtWav{6}(:,iStart1(t):i5End1(t)), 2);
+            pMatrix(:,t,6,3) = nanmean(dtWav{6}(:,iStart2(t):i3End2(t)), 2);
+            pMatrix(:,t,6,4) = nanmean(dtWav{6}(:,iStart2(t):i5End2(t)), 2);
+            pMatrix(:,t,6,5) = nanmean(dtWav{6}(:,iStart3(t):i3End3(t)), 2);
+            pMatrix(:,t,6,6) = nanmean(dtWav{6}(:,iStart3(t):i5End3(t)), 2);
+            pMatrix(:,t,6,7) = nanmean(dtWav{6}(:,iStartM(t):iEndM(t)), 2);
+            pMatrix(:,t,6,8) = nanmean(dtWav{6}(:,iStart1(t):iEnd(t)), 2);
+        end
+        
+%         for t1 = 1:cN
+%             for t2 = 1:sN
+%                 for t3 = 1:bN
+%                     for t4 = 1:fN
+%                         disp(pN + (t1-1)*sN*bN*fN + (t2-1)*bN*fN + (t3-1)*fN + t4)
+%                     end
+%                 end
+%             end
+%         end
+        
+        for t1 = 0:(cN-1)
+            for t2 = 0:(sN-1)
+                for t3 = 0:(bN-1)
+                    for t4 = 1:fN
+                        pTable(pN + t1*sN*bN*fN + t2*bN*fN + t3*fN + t4) = ...
+                            pMatrix(t1+1,t2+1,t3+1,t4);
+                    end
+                end
+            end
         end
         
         % CH1 정보
