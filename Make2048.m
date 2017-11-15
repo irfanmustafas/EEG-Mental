@@ -31,11 +31,11 @@ for p = 1:pSize(1)
     if Sinfo(p, iDO), continue, end
     
     cLimit = Sinfo(p,iHav);
-    if TF.fs == 256
+    if TF.Fs == 256
         qStart = 1;
         if cLimit == 0, qLimit = 5;
         else qLimit = cLimit - 1; end
-    elseif TF.fs == 2048
+    elseif TF.Fs == 2048
         qStart = cLimit;
         qLimit = 5;
     end
@@ -50,6 +50,8 @@ for p = 1:pSize(1)
         if strcmp(dPath, 'E003-1'), continue, end
         if strcmp(dPath, 'E004-1'), continue, end
         if ~Sinfo(p,iAge+q), continue, end
+        % 256Hz인 경우 지나가는 조건 추가
+        if ~cLimit, continue, end
         
         disp(dPath);
         TF.lines = SaveSet2048(dPath, nCh, TF, elocs);
