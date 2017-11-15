@@ -26,43 +26,49 @@ dPath = '';
 pwr2048 = cell(0,6);
 
 
-%% TXT Raw DATA EEGLAB 데이터로 변환 과정 (SaveSet256.m)
-% for p = 1:pSize(1)
-%     if Sinfo(p, iDO), continue, end
-%     
-%     cLimit = Sinfo(p,iHav);
-%     if cLimit == 0, qLimit = 5;
-%     else qLimit = cLimit - 1; end
-%        
-%     % 실험 프로토콜이 바뀌기 전까지 qLimit 표시까지만, qLimit 부터는 2048Hz
-%     for q = 1:qLimit
-%         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
-%         
-%         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
-%         % E003-1은 혼자 데이터 길이가 감, E004-1은 2번 채널이 없음
-%         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
-%         if strcmp(dPath, 'E003-1'), continue, end
-%         if strcmp(dPath, 'E004-1'), continue, end
-%         if ~Sinfo(p,iAge+q), continue, end
-%         
-%         disp(dPath);
-%         TF.lines = SaveSet256(dPath, nCh, TF, elocs);
-%         
-%         if isempty(TF.f_idx)
-%             set_name = [dPath '.set'];
-%             EEG = pop_loadset('filepath', REP_DIR, 'filename', set_name);
-%             
-%             % F값 범위 할당(TF.f_idx) 위해 한번 먼저 실행
-%             [S,F,T,P]   = spectrogram(double(EEG.data(1,:)),TF.nWin,TF.nWin-TF.nShift,TF.nFFT,TF.Fs);
-%             TF.f_idx    = (F>=TF.frange(1)) & (F<=TF.frange(2));    % Frequencey 쳐내기
-%             TF.freq     = F(TF.f_idx);
-%             TF.time     = T;
-%             % 0~55 Hz 해당하는 Frequencey만 쳐냄
-%         end
-%     end
-% end
-% % TF 값 다음에 쓰기 위해 저장
-% save([REP_DIR 'TF.mat'], 'TF')
+%% TXT Raw DATA EEGLAB 데이터로 변환 과정 (SaveSet2048.m)
+for p = 1:pSize(1)
+    if Sinfo(p, iDO), continue, end
+    
+    cLimit = Sinfo(p,iHav);
+    if TF.fs == 256
+        qStart = 1;
+        if cLimit == 0, qLimit = 5;
+        else qLimit = cLimit - 1; end
+    elseif TF.fs == 2048
+        qStart = cLimit;
+        qLimit = 5;
+    end
+       
+    % 프로토콜 여부에 따라 앞에서 qStart와 qLimit이 정의됨
+    for q = qStart:qLimit
+        dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
+        
+        % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
+        % E003-1은 혼자 데이터 길이가 감, E004-1은 2번 채널이 없음
+        % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
+        if strcmp(dPath, 'E003-1'), continue, end
+        if strcmp(dPath, 'E004-1'), continue, end
+        if ~Sinfo(p,iAge+q), continue, end
+        
+        disp(dPath);
+        TF.lines = SaveSet2048(dPath, nCh, TF, elocs);
+        
+        if isempty(TF.f_idx)
+            set_name = [dPath '.set'];
+            EEG = pop_loadset('filepath', REP_DIR, 'filename', set_name);
+            
+            % F값 범위 할당(TF.f_idx) 위해 한번 먼저 실행
+            [S,F,T,P]   = spectrogram(double(EEG.data(1,:)),TF.nWin,TF.nWin-TF.nShift,TF.nFFT,TF.Fs);
+            TF.f_idx    = (F>=TF.frange(1)) & (F<=TF.frange(2));    % Frequencey 쳐내기
+            TF.freq     = F(TF.f_idx);
+            TF.time     = T;
+            % 0~55 Hz 해당하는 Frequencey만 쳐냄
+        end
+    end
+end
+% TF 값 다음에 쓰기 위해 저장
+save([REP_DIR 'TF.mat'], 'TF')
 
 
 %% EEGLAB 데이터 읽어서 Raw Power 값 기록 (GetPwr256.m)
