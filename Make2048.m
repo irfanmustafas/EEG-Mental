@@ -266,177 +266,167 @@ pwr2048 = cell(0,6);
 
 
 %% 자극 구간 설정 후 각 Band별 값
-load([REP_DIR 'WT.mat'])
-
-% Feature 구간 8개:
-% (1) 처음 3초 / (2) 처음 5초 / (3) 60초 후 3초 / (4) 60초 후 5초
-% (5) 120초 후 3초 / (6) 120초 후 5초 / (7) 중간 100초 / (8) 전체 300초
-tStart1 = [10 320 630 940 1250 1570];
-t3End1  = tStart1 + 3;
-t5End1  = tStart1 + 5;
-tStart2 = tStart1 + 60;
-t3End2  = tStart2 + 3;
-t5End2  = tStart2 + 5;
-tStart3 = tStart1 + 120;
-t3End3  = tStart3 + 3;
-t5End3  = tStart3 + 5;
-tStartM = tStart1 + 100;
-tEndM = tStart1 + 200;
-tEnd    = tStart1 + 300;
-
-% 실제 변환된 주소(index) 저장 변수 지정
-sm = size(tStart1);
-iStart1 = zeros(sm);
-i3End1  = zeros(sm);
-i5End1  = zeros(sm);
-iStart2 = zeros(sm);
-i3End2  = zeros(sm);
-i5End2  = zeros(sm);
-iStart3 = zeros(sm);
-i3End3  = zeros(sm);
-i5End3  = zeros(sm);
-iStartM = zeros(sm);
-iEndM   = zeros(sm);
-iEnd    = zeros(sm);
-
-% 시간 구간을 주소 값으로 변환
-for t = 1:sm(2)
-   [~,iStart1(t)]   = min(abs(WT.time-tStart1(t)));
-   [~,i3End1(t)]    = min(abs(WT.time-t3End1(t)));
-   [~,i5End1(t)]    = min(abs(WT.time-t5End1(t)));
-   [~,iStart2(t)]   = min(abs(WT.time-tStart2(t)));
-   [~,i3End2(t)]    = min(abs(WT.time-t3End2(t)));
-   [~,i5End2(t)]    = min(abs(WT.time-t5End2(t)));
-   [~,iStart3(t)]   = min(abs(WT.time-tStart3(t)));
-   [~,i3End3(t)]    = min(abs(WT.time-t3End3(t)));
-   [~,i5End3(t)]    = min(abs(WT.time-t5End3(t)));
-   [~,iStartM(t)]   = min(abs(WT.time-tStartM(t)));
-   [~,iEndM(t)]     = min(abs(WT.time-tEndM(t)));
-   [~,iEnd(t)]      = min(abs(WT.time-tEnd(t)));
-end
-
-% 각 피험자별 파일 읽어온 후에 계산
-% 총 Feature 수: Channel 수 2개 X 자극 6개 X Band 구간 6개 X Feature 구간 8개 = 576개
-% Channel은 원래 2개 이지만 Channel1 - Channel2 뺀 차이도 기록해볼 의미 있음
-% 값 확인을 위해 일단 채널 2개만 먼저 해보고 채널 차이는 나중에 해보기로
-pN = 5; cN = 2; sN = 6; bN = 6; fN = 8;
-pMatrix = zeros(cN, sN, bN, fN);
-pTable = zeros(1,581);      % 576 + 5;
-tTable256 = zeros(0,581);      % 전체 피험자 저장용
-
-for p = 1:pSize(1)
-    if Sinfo(p, iDO), continue, end
-    
-    cLimit = Sinfo(p,iHav);
-    if cLimit == 0, qLimit = 5;
-    else qLimit = cLimit - 1; end
- 
-    % 실험 프로토콜이 바뀌기 전까지 qLimit 표시까지만, qLimit 부터는 2048Hz
-    for q = 1:qLimit
-        dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
-        
-        % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
-        % E003-1은 혼자 데이터 길이가 감, E004-1은 2번 채널이 없음
-        % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
-        if strcmp(dPath, 'E003-1'), continue, end
-        if strcmp(dPath, 'E004-1'), continue, end
-        if ~Sinfo(p,iAge+q), continue, end        
-    
-        disp(dPath);
-        load([REP_DIR dPath '_gmWav' '.mat'])
-        load([REP_DIR dPath '_muWav' '.mat'])
-        load([REP_DIR dPath '_apWav' '.mat'])
-        load([REP_DIR dPath '_btWav' '.mat'])
-        load([REP_DIR dPath '_thWav' '.mat'])
-        load([REP_DIR dPath '_dtWav' '.mat'])
-        
-        % 피험자 기본 정보 5개 옮기기
-        pTable(1:5) = cell2mat(gmWav(1:5));
-        
-        % band 별 Feature 얻기, 2채널 정보로 넘어옴.
-        % 자극 구간 6개 별로 더 만들어야함, 지금은 6번 계산 후 마지막 자극만 쌓이는 것.
-        for t = 1:sm(2)
-            pMatrix(:,t,1,1) = nanmean(gmWav{6}(:,iStart1(t):i3End1(t)), 2);
-            pMatrix(:,t,1,2) = nanmean(gmWav{6}(:,iStart1(t):i5End1(t)), 2);
-            pMatrix(:,t,1,3) = nanmean(gmWav{6}(:,iStart2(t):i3End2(t)), 2);
-            pMatrix(:,t,1,4) = nanmean(gmWav{6}(:,iStart2(t):i5End2(t)), 2);
-            pMatrix(:,t,1,5) = nanmean(gmWav{6}(:,iStart3(t):i3End3(t)), 2);
-            pMatrix(:,t,1,6) = nanmean(gmWav{6}(:,iStart3(t):i5End3(t)), 2);
-            pMatrix(:,t,1,7) = nanmean(gmWav{6}(:,iStartM(t):iEndM(t)), 2);
-            pMatrix(:,t,1,8) = nanmean(gmWav{6}(:,iStart1(t):iEnd(t)), 2);
-            
-            pMatrix(:,t,2,1) = nanmean(muWav{6}(:,iStart1(t):i3End1(t)), 2);
-            pMatrix(:,t,2,2) = nanmean(muWav{6}(:,iStart1(t):i5End1(t)), 2);
-            pMatrix(:,t,2,3) = nanmean(muWav{6}(:,iStart2(t):i3End2(t)), 2);
-            pMatrix(:,t,2,4) = nanmean(muWav{6}(:,iStart2(t):i5End2(t)), 2);
-            pMatrix(:,t,2,5) = nanmean(muWav{6}(:,iStart3(t):i3End3(t)), 2);
-            pMatrix(:,t,2,6) = nanmean(muWav{6}(:,iStart3(t):i5End3(t)), 2);
-            pMatrix(:,t,2,7) = nanmean(muWav{6}(:,iStartM(t):iEndM(t)), 2);
-            pMatrix(:,t,2,8) = nanmean(muWav{6}(:,iStart1(t):iEnd(t)), 2);
-            
-            pMatrix(:,t,3,1) = nanmean(apWav{6}(:,iStart1(t):i3End1(t)), 2);
-            pMatrix(:,t,3,2) = nanmean(apWav{6}(:,iStart1(t):i5End1(t)), 2);
-            pMatrix(:,t,3,3) = nanmean(apWav{6}(:,iStart2(t):i3End2(t)), 2);
-            pMatrix(:,t,3,4) = nanmean(apWav{6}(:,iStart2(t):i5End2(t)), 2);
-            pMatrix(:,t,3,5) = nanmean(apWav{6}(:,iStart3(t):i3End3(t)), 2);
-            pMatrix(:,t,3,6) = nanmean(apWav{6}(:,iStart3(t):i5End3(t)), 2);
-            pMatrix(:,t,3,7) = nanmean(apWav{6}(:,iStartM(t):iEndM(t)), 2);
-            pMatrix(:,t,3,8) = nanmean(apWav{6}(:,iStart1(t):iEnd(t)), 2);
-            
-            pMatrix(:,t,4,1) = nanmean(btWav{6}(:,iStart1(t):i3End1(t)), 2);
-            pMatrix(:,t,4,2) = nanmean(btWav{6}(:,iStart1(t):i5End1(t)), 2);
-            pMatrix(:,t,4,3) = nanmean(btWav{6}(:,iStart2(t):i3End2(t)), 2);
-            pMatrix(:,t,4,4) = nanmean(btWav{6}(:,iStart2(t):i5End2(t)), 2);
-            pMatrix(:,t,4,5) = nanmean(btWav{6}(:,iStart3(t):i3End3(t)), 2);
-            pMatrix(:,t,4,6) = nanmean(btWav{6}(:,iStart3(t):i5End3(t)), 2);
-            pMatrix(:,t,4,7) = nanmean(btWav{6}(:,iStartM(t):iEndM(t)), 2);
-            pMatrix(:,t,4,8) = nanmean(btWav{6}(:,iStart1(t):iEnd(t)), 2);
-            
-            pMatrix(:,t,5,1) = nanmean(thWav{6}(:,iStart1(t):i3End1(t)), 2);
-            pMatrix(:,t,5,2) = nanmean(thWav{6}(:,iStart1(t):i5End1(t)), 2);
-            pMatrix(:,t,5,3) = nanmean(thWav{6}(:,iStart2(t):i3End2(t)), 2);
-            pMatrix(:,t,5,4) = nanmean(thWav{6}(:,iStart2(t):i5End2(t)), 2);
-            pMatrix(:,t,5,5) = nanmean(thWav{6}(:,iStart3(t):i3End3(t)), 2);
-            pMatrix(:,t,5,6) = nanmean(thWav{6}(:,iStart3(t):i5End3(t)), 2);
-            pMatrix(:,t,5,7) = nanmean(thWav{6}(:,iStartM(t):iEndM(t)), 2);
-            pMatrix(:,t,5,8) = nanmean(thWav{6}(:,iStart1(t):iEnd(t)), 2);
-            
-            pMatrix(:,t,6,1) = nanmean(dtWav{6}(:,iStart1(t):i3End1(t)), 2);
-            pMatrix(:,t,6,2) = nanmean(dtWav{6}(:,iStart1(t):i5End1(t)), 2);
-            pMatrix(:,t,6,3) = nanmean(dtWav{6}(:,iStart2(t):i3End2(t)), 2);
-            pMatrix(:,t,6,4) = nanmean(dtWav{6}(:,iStart2(t):i5End2(t)), 2);
-            pMatrix(:,t,6,5) = nanmean(dtWav{6}(:,iStart3(t):i3End3(t)), 2);
-            pMatrix(:,t,6,6) = nanmean(dtWav{6}(:,iStart3(t):i5End3(t)), 2);
-            pMatrix(:,t,6,7) = nanmean(dtWav{6}(:,iStartM(t):iEndM(t)), 2);
-            pMatrix(:,t,6,8) = nanmean(dtWav{6}(:,iStart1(t):iEnd(t)), 2);
-        end
-        
-%         for t1 = 1:cN
-%             for t2 = 1:sN
-%                 for t3 = 1:bN
+% load([REP_DIR 'WT.mat'])
+% 
+% % Feature 구간 8개:
+% % (1) 처음 3초 / (2) 처음 5초 / (3) 60초 후 3초 / (4) 60초 후 5초
+% % (5) 120초 후 3초 / (6) 120초 후 5초 / (7) 중간 100초 / (8) 전체 300초
+% tStart1 = [10 320 630 940 1250 1570];
+% t3End1  = tStart1 + 3;
+% t5End1  = tStart1 + 5;
+% tStart2 = tStart1 + 60;
+% t3End2  = tStart2 + 3;
+% t5End2  = tStart2 + 5;
+% tStart3 = tStart1 + 120;
+% t3End3  = tStart3 + 3;
+% t5End3  = tStart3 + 5;
+% tStartM = tStart1 + 100;
+% tEndM = tStart1 + 200;
+% tEnd    = tStart1 + 300;
+% 
+% % 실제 변환된 주소(index) 저장 변수 지정
+% sm = size(tStart1);
+% iStart1 = zeros(sm);
+% i3End1  = zeros(sm);
+% i5End1  = zeros(sm);
+% iStart2 = zeros(sm);
+% i3End2  = zeros(sm);
+% i5End2  = zeros(sm);
+% iStart3 = zeros(sm);
+% i3End3  = zeros(sm);
+% i5End3  = zeros(sm);
+% iStartM = zeros(sm);
+% iEndM   = zeros(sm);
+% iEnd    = zeros(sm);
+% 
+% % 시간 구간을 주소 값으로 변환
+% for t = 1:sm(2)
+%    [~,iStart1(t)]   = min(abs(WT.time-tStart1(t)));
+%    [~,i3End1(t)]    = min(abs(WT.time-t3End1(t)));
+%    [~,i5End1(t)]    = min(abs(WT.time-t5End1(t)));
+%    [~,iStart2(t)]   = min(abs(WT.time-tStart2(t)));
+%    [~,i3End2(t)]    = min(abs(WT.time-t3End2(t)));
+%    [~,i5End2(t)]    = min(abs(WT.time-t5End2(t)));
+%    [~,iStart3(t)]   = min(abs(WT.time-tStart3(t)));
+%    [~,i3End3(t)]    = min(abs(WT.time-t3End3(t)));
+%    [~,i5End3(t)]    = min(abs(WT.time-t5End3(t)));
+%    [~,iStartM(t)]   = min(abs(WT.time-tStartM(t)));
+%    [~,iEndM(t)]     = min(abs(WT.time-tEndM(t)));
+%    [~,iEnd(t)]      = min(abs(WT.time-tEnd(t)));
+% end
+% 
+% % 각 피험자별 파일 읽어온 후에 계산
+% % 총 Feature 수: Channel 수 2개 X 자극 6개 X Band 구간 6개 X Feature 구간 8개 = 576개
+% % Channel은 원래 2개 이지만 Channel1 - Channel2 뺀 차이도 기록해볼 의미 있음
+% % 값 확인을 위해 일단 채널 2개만 먼저 해보고 채널 차이는 나중에 해보기로
+% pN = 5; cN = 2; sN = 6; bN = 6; fN = 8;
+% pMatrix = zeros(cN, sN, bN, fN);
+% pTable = zeros(1,581);      % 576 + 5;
+% tTable256 = zeros(0,581);      % 전체 피험자 저장용
+% 
+% for p = 1:pSize(1)
+%     if Sinfo(p, iDO), continue, end
+%     
+%     cLimit = Sinfo(p,iHav);
+%     if cLimit == 0, qLimit = 5;
+%     else qLimit = cLimit - 1; end
+%  
+%     % 실험 프로토콜이 바뀌기 전까지 qLimit 표시까지만, qLimit 부터는 2048Hz
+%     for q = 1:qLimit
+%         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
+%         
+%         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
+%         % E003-1은 혼자 데이터 길이가 감, E004-1은 2번 채널이 없음
+%         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
+%         if strcmp(dPath, 'E003-1'), continue, end
+%         if strcmp(dPath, 'E004-1'), continue, end
+%         if ~Sinfo(p,iAge+q), continue, end        
+%     
+%         disp(dPath);
+%         load([REP_DIR dPath '_gmWav' '.mat'])
+%         load([REP_DIR dPath '_muWav' '.mat'])
+%         load([REP_DIR dPath '_apWav' '.mat'])
+%         load([REP_DIR dPath '_btWav' '.mat'])
+%         load([REP_DIR dPath '_thWav' '.mat'])
+%         load([REP_DIR dPath '_dtWav' '.mat'])
+%         
+%         % 피험자 기본 정보 5개 옮기기
+%         pTable(1:5) = cell2mat(gmWav(1:5));
+%         
+%         % band 별 Feature 얻기, 2채널 정보로 넘어옴.
+%         % 자극 구간 6개 별로 더 만들어야함, 지금은 6번 계산 후 마지막 자극만 쌓이는 것.
+%         for t = 1:sm(2)
+%             pMatrix(:,t,1,1) = nanmean(gmWav{6}(:,iStart1(t):i3End1(t)), 2);
+%             pMatrix(:,t,1,2) = nanmean(gmWav{6}(:,iStart1(t):i5End1(t)), 2);
+%             pMatrix(:,t,1,3) = nanmean(gmWav{6}(:,iStart2(t):i3End2(t)), 2);
+%             pMatrix(:,t,1,4) = nanmean(gmWav{6}(:,iStart2(t):i5End2(t)), 2);
+%             pMatrix(:,t,1,5) = nanmean(gmWav{6}(:,iStart3(t):i3End3(t)), 2);
+%             pMatrix(:,t,1,6) = nanmean(gmWav{6}(:,iStart3(t):i5End3(t)), 2);
+%             pMatrix(:,t,1,7) = nanmean(gmWav{6}(:,iStartM(t):iEndM(t)), 2);
+%             pMatrix(:,t,1,8) = nanmean(gmWav{6}(:,iStart1(t):iEnd(t)), 2);
+%             
+%             pMatrix(:,t,2,1) = nanmean(muWav{6}(:,iStart1(t):i3End1(t)), 2);
+%             pMatrix(:,t,2,2) = nanmean(muWav{6}(:,iStart1(t):i5End1(t)), 2);
+%             pMatrix(:,t,2,3) = nanmean(muWav{6}(:,iStart2(t):i3End2(t)), 2);
+%             pMatrix(:,t,2,4) = nanmean(muWav{6}(:,iStart2(t):i5End2(t)), 2);
+%             pMatrix(:,t,2,5) = nanmean(muWav{6}(:,iStart3(t):i3End3(t)), 2);
+%             pMatrix(:,t,2,6) = nanmean(muWav{6}(:,iStart3(t):i5End3(t)), 2);
+%             pMatrix(:,t,2,7) = nanmean(muWav{6}(:,iStartM(t):iEndM(t)), 2);
+%             pMatrix(:,t,2,8) = nanmean(muWav{6}(:,iStart1(t):iEnd(t)), 2);
+%             
+%             pMatrix(:,t,3,1) = nanmean(apWav{6}(:,iStart1(t):i3End1(t)), 2);
+%             pMatrix(:,t,3,2) = nanmean(apWav{6}(:,iStart1(t):i5End1(t)), 2);
+%             pMatrix(:,t,3,3) = nanmean(apWav{6}(:,iStart2(t):i3End2(t)), 2);
+%             pMatrix(:,t,3,4) = nanmean(apWav{6}(:,iStart2(t):i5End2(t)), 2);
+%             pMatrix(:,t,3,5) = nanmean(apWav{6}(:,iStart3(t):i3End3(t)), 2);
+%             pMatrix(:,t,3,6) = nanmean(apWav{6}(:,iStart3(t):i5End3(t)), 2);
+%             pMatrix(:,t,3,7) = nanmean(apWav{6}(:,iStartM(t):iEndM(t)), 2);
+%             pMatrix(:,t,3,8) = nanmean(apWav{6}(:,iStart1(t):iEnd(t)), 2);
+%             
+%             pMatrix(:,t,4,1) = nanmean(btWav{6}(:,iStart1(t):i3End1(t)), 2);
+%             pMatrix(:,t,4,2) = nanmean(btWav{6}(:,iStart1(t):i5End1(t)), 2);
+%             pMatrix(:,t,4,3) = nanmean(btWav{6}(:,iStart2(t):i3End2(t)), 2);
+%             pMatrix(:,t,4,4) = nanmean(btWav{6}(:,iStart2(t):i5End2(t)), 2);
+%             pMatrix(:,t,4,5) = nanmean(btWav{6}(:,iStart3(t):i3End3(t)), 2);
+%             pMatrix(:,t,4,6) = nanmean(btWav{6}(:,iStart3(t):i5End3(t)), 2);
+%             pMatrix(:,t,4,7) = nanmean(btWav{6}(:,iStartM(t):iEndM(t)), 2);
+%             pMatrix(:,t,4,8) = nanmean(btWav{6}(:,iStart1(t):iEnd(t)), 2);
+%             
+%             pMatrix(:,t,5,1) = nanmean(thWav{6}(:,iStart1(t):i3End1(t)), 2);
+%             pMatrix(:,t,5,2) = nanmean(thWav{6}(:,iStart1(t):i5End1(t)), 2);
+%             pMatrix(:,t,5,3) = nanmean(thWav{6}(:,iStart2(t):i3End2(t)), 2);
+%             pMatrix(:,t,5,4) = nanmean(thWav{6}(:,iStart2(t):i5End2(t)), 2);
+%             pMatrix(:,t,5,5) = nanmean(thWav{6}(:,iStart3(t):i3End3(t)), 2);
+%             pMatrix(:,t,5,6) = nanmean(thWav{6}(:,iStart3(t):i5End3(t)), 2);
+%             pMatrix(:,t,5,7) = nanmean(thWav{6}(:,iStartM(t):iEndM(t)), 2);
+%             pMatrix(:,t,5,8) = nanmean(thWav{6}(:,iStart1(t):iEnd(t)), 2);
+%             
+%             pMatrix(:,t,6,1) = nanmean(dtWav{6}(:,iStart1(t):i3End1(t)), 2);
+%             pMatrix(:,t,6,2) = nanmean(dtWav{6}(:,iStart1(t):i5End1(t)), 2);
+%             pMatrix(:,t,6,3) = nanmean(dtWav{6}(:,iStart2(t):i3End2(t)), 2);
+%             pMatrix(:,t,6,4) = nanmean(dtWav{6}(:,iStart2(t):i5End2(t)), 2);
+%             pMatrix(:,t,6,5) = nanmean(dtWav{6}(:,iStart3(t):i3End3(t)), 2);
+%             pMatrix(:,t,6,6) = nanmean(dtWav{6}(:,iStart3(t):i5End3(t)), 2);
+%             pMatrix(:,t,6,7) = nanmean(dtWav{6}(:,iStartM(t):iEndM(t)), 2);
+%             pMatrix(:,t,6,8) = nanmean(dtWav{6}(:,iStart1(t):iEnd(t)), 2);
+%         end
+%         
+%         for t1 = 0:(cN-1)
+%             for t2 = 0:(sN-1)
+%                 for t3 = 0:(bN-1)
 %                     for t4 = 1:fN
-%                         disp(pN + (t1-1)*sN*bN*fN + (t2-1)*bN*fN + (t3-1)*fN + t4)
+%                         pTable(pN + t1*sN*bN*fN + t2*bN*fN + t3*fN + t4) = ...
+%                             pMatrix(t1+1,t2+1,t3+1,t4);
 %                     end
 %                 end
 %             end
 %         end
-        
-        for t1 = 0:(cN-1)
-            for t2 = 0:(sN-1)
-                for t3 = 0:(bN-1)
-                    for t4 = 1:fN
-                        pTable(pN + t1*sN*bN*fN + t2*bN*fN + t3*fN + t4) = ...
-                            pMatrix(t1+1,t2+1,t3+1,t4);
-                    end
-                end
-            end
-        end
-
-        % 전체 변수에 누적 저장
-            tTable256 = cat(1, tTable256, pTable);
-    end
-    
-    save([REP_DIR 'tTable256.mat'], 'tTable256', '-v7.3')
-end
+% 
+%         % 전체 변수에 누적 저장
+%             tTable256 = cat(1, tTable256, pTable);
+%     end
+%     
+%     save([REP_DIR 'tTable256.mat'], 'tTable256', '-v7.3')
+% end
 
 % xlswrite('tTable256.xlsx', tTable256)
