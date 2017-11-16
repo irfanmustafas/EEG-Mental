@@ -1,6 +1,6 @@
 close all; clear; clc;
 
-load('S256.mat');
+load('S2048.mat');
 Sinfo(75,10) = 4;    % E077-4 번부터 2048이라 직접 입력해 줌
 Sinfo(76,10) = 4;    % E078-4 번부터 2048이라 직접 입력해 줌
 
