@@ -6,7 +6,10 @@ oFs      = TF.Fs;     % 원래 Sampling Rate
 Fs       = 256;     % 변환할 Sampling Rate
 
 % E가 붙은 경로가 존재하지 않는 경우 떼고 읽어오게 설정
-if 7 ~= exist([RAW_DIR dPath], 'dir'), dPath = dPath(2:end); end
+if 7 ~= exist([RAW_DIR dPath], 'dir')
+    dPath = dPath(2:end);
+    disp(['[Detected] ' dPath])
+end
 
 txt_name    = [RAW_DIR dPath '/EEG-1.txt'];
 ch1         = dlmread(txt_name);
@@ -15,6 +18,10 @@ txt_name    = [RAW_DIR dPath '/EEG-2.txt'];
 ch2         = dlmread(txt_name);
 ch2(:,1) = [];
 data = [ch1'; ch2'];
+
+if dPath(1) ~= 'E'
+    dPath = ['E' dPath];
+end
 
 EEG      = pop_loadset('sample.set');
 EEG.setname = dPath;
