@@ -35,7 +35,7 @@ EEG.xmax    = EEG.times(end);
 EEG.chanlocs = elocs;
 EEG         = eeg_checkset(EEG);
 
-%%%% down sampling oFs(256) -> Fs(256)
+%%%% down sampling oFs(2048) -> Fs(256)
 EEG         = pop_resample(EEG,Fs);
 HighF       = TF.frange(2);
 
