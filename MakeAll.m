@@ -15,29 +15,37 @@ chName   = {elocs.labels}';
 nCh      = length(chName);
 
 REP_DIR  = './Rep/';
-TF.tWin     = 0.50;
-TF.tShift   = 0.10;
-TF.Fs       = 2048;                  % 2048 Hz Resolution
-TF.frange   = [0 55];                % 0~55 Hz 범위
-TF.nWin     = fix(TF.tWin*TF.Fs);    % nWin은 Fs의 절반(0.05)로 설정, 128
-TF.nShift   = fix(TF.tShift*TF.Fs);  % nShift는 Fs의 1/10(0.1)의 정수로 설정, 25
-TF.nFFT     = 2^nextpow2(TF.nWin);      % nWin과 가장 가까운 2의 거듭제곱 수 구하기
-TF.f_idx = [];
+TF256.tWin     = 0.50;
+TF256.tShift   = 0.10;
+TF256.Fs       = 256;                  % 256 Hz Resolution
+TF256.frange   = [0 55];                % 0~55 Hz 범위
+TF256.nWin     = fix(TF256.tWin*TF256.Fs);    % nWin은 Fs의 절반(0.05)로 설정, 128
+TF256.nShift   = fix(TF256.tShift*TF256.Fs);  % nShift는 Fs의 1/10(0.1)의 정수로 설정, 25
+TF256.nFFT     = 2^nextpow2(TF256.nWin);      % nWin과 가장 가까운 2의 거듭제곱 수 구하기
+TF256.f_idx = [];
+
+TF2048.tWin     = 0.50;
+TF2048.tShift   = 0.10;
+TF2048.Fs       = 2048;                  % 2048 Hz Resolution
+TF2048.frange   = [0 55];                % 0~55 Hz 범위
+TF2048.nWin     = fix(TF2048.tWin*TF2048.Fs);    % nWin은 Fs의 절반(0.05)로 설정, 128
+TF2048.nShift   = fix(TF2048.tShift*TF2048.Fs);  % nShift는 Fs의 1/10(0.1)의 정수로 설정, 25
+TF2048.nFFT     = 2^nextpow2(TF2048.nWin);      % nWin과 가장 가까운 2의 거듭제곱 수 구하기
+TF2048.f_idx = [];
 
 dPath = '';
-pwr2048 = cell(0,6);
 
 
-%% TXT Raw DATA EEGLAB 데이터로 변환 과정 (SaveSet2048.m)
+%% TXT Raw DATA EEGLAB 데이터로 변환 과정 (SaveSet.m)
 for p = 1:pSize(1)
     if Sinfo(p, iDO), continue, end
     
-    cLimit = Sinfo(p,iHav);
-    if TF.Fs == 256
+    cLimit = sInfo(p,iHav);
+    if TF256.Fs == 256
         qStart = 1;
         if cLimit == 0, qLimit = 5;
         else qLimit = cLimit - 1; end
-    elseif TF.Fs == 2048
+    elseif TF256.Fs == 2048
         qStart = cLimit;
         qLimit = 5;
     end
@@ -47,26 +55,25 @@ for p = 1:pSize(1)
         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
         
         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
-        % E003-1은 혼자 데이터 길이가 감, E004-1은 2번 채널이 없음
+        % E003-1은 혼자 데이터 길이가 김,
         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
         if strcmp(dPath, 'E003-1'), continue, end
-        if strcmp(dPath, 'E004-1'), continue, end
         if ~Sinfo(p,iAge+q), continue, end
         % 256Hz인 경우 지나가는 조건 추가
         if ~cLimit, continue, end
         
         disp(dPath);
-        TF.lines = SaveSet2048(dPath, nCh, TF, elocs);
+        TF256.lines = SaveSet2048(dPath, nCh, TF256, elocs);
         
-        if isempty(TF.f_idx)
+        if isempty(TF256.f_idx)
             set_name = [dPath '.set'];
             EEG = pop_loadset('filepath', REP_DIR, 'filename', set_name);
             
             % F값 범위 할당(TF.f_idx) 위해 한번 먼저 실행
-            [S,F,T,P]   = spectrogram(double(EEG.data(1,:)),TF.nWin,TF.nWin-TF.nShift,TF.nFFT,TF.Fs);
-            TF.f_idx    = (F>=TF.frange(1)) & (F<=TF.frange(2));    % Frequencey 쳐내기
-            TF.freq     = F(TF.f_idx);
-            TF.time     = T;
+            [S,F,T,P]   = spectrogram(double(EEG.data(1,:)),TF256.nWin,TF256.nWin-TF256.nShift,TF256.nFFT,TF256.Fs);
+            TF256.f_idx    = (F>=TF256.frange(1)) & (F<=TF256.frange(2));    % Frequencey 쳐내기
+            TF256.freq     = F(TF256.f_idx);
+            TF256.time     = T;
             % 0~55 Hz 해당하는 Frequencey만 쳐냄
         end
     end
