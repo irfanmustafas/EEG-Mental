@@ -39,18 +39,18 @@ dPath = '';
 %% TXT Raw DATA EEGLAB 데이터로 변환 과정 (SaveSet.m)
 for p = 1:pSize(1)
     % 중도 포기(Drop)한 피험자 뛰어넘기
-    if Sinfo(p, iDO), continue, end
+    if sInfo(p, iDO), continue, end
     
     % 행동 실험 추가되었을 때로 2048Hz 구분
     cLimit = sInfo(p,iHav);
     for q = 1:5
-        dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
+        dPath = sprintf('E%03d-%d',sInfo(p,iID),q);
         
         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
         % E003-1은 혼자 데이터 길이가 김,
         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
         if strcmp(dPath, 'E003-1'), continue, end
-        if ~Sinfo(p,iAge+q), continue, end
+        if ~sInfo(p,iAge+q), continue, end
         % 256Hz인 경우 지나가는 조건 추가
         if ~cLimit, continue, end
         
