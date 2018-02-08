@@ -51,6 +51,8 @@ for p = 1:pSize(1)
         if strcmp(dPath, 'E003-1'), continue, end
         % E114-4 데이터 없음
         if strcmp(dPath, 'E114-4'), continue, end
+        % E120-4 데이터 없음
+        if strcmp(dPath, 'E120-4'), continue, end
         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
         if ~sInfo(p,iAge+q), continue, end
         
