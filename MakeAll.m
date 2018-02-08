@@ -87,7 +87,7 @@ for p = 1:pSize(1)
     end
 end
 % TF 값 다음에 쓰기 위해 저장
-save([REP_DIR 'TF.mat'], 'TF')
+save([REP_DIR 'TF.mat'], 'TF256', 'TF2048')
 
 
 %% EEGLAB 데이터 읽어서 Raw Power 값 기록 (GetPwr2048.m)
