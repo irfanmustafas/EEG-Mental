@@ -18,7 +18,7 @@ REP_DIR  = './Rep/';
 TF256.tWin     = 0.50;
 TF256.tShift   = 0.10;
 TF256.Fs       = 256;                  % 256 Hz Resolution
-TF256.frange   = [0 55];                % 0~55 Hz 범위
+TF256.frange   = [4 50];                % 0~55 Hz 범위
 TF256.nWin     = fix(TF256.tWin*TF256.Fs);    % nWin은 Fs의 절반(0.05)로 설정, 128
 TF256.nShift   = fix(TF256.tShift*TF256.Fs);  % nShift는 Fs의 1/10(0.1)의 정수로 설정, 25
 TF256.nFFT     = 2^nextpow2(TF256.nWin);      % nWin과 가장 가까운 2의 거듭제곱 수 구하기
@@ -27,7 +27,7 @@ TF256.f_idx = [];
 TF2048.tWin     = 0.50;
 TF2048.tShift   = 0.10;
 TF2048.Fs       = 2048;                  % 2048 Hz Resolution
-TF2048.frange   = [0 55];                % 0~55 Hz 범위
+TF2048.frange   = [4 50];                % 0~55 Hz 범위
 TF2048.nWin     = fix(TF2048.tWin*TF2048.Fs);    % nWin은 Fs의 절반(0.05)로 설정, 128
 TF2048.nShift   = fix(TF2048.tShift*TF2048.Fs);  % nShift는 Fs의 1/10(0.1)의 정수로 설정, 25
 TF2048.nFFT     = 2^nextpow2(TF2048.nWin);      % nWin과 가장 가까운 2의 거듭제곱 수 구하기
@@ -72,7 +72,7 @@ for p = 1:pSize(1)
             TF256.f_idx    = (F>=TF256.frange(1)) & (F<=TF256.frange(2));    % Frequencey 쳐내기
             TF256.freq     = F(TF256.f_idx);
             TF256.time     = T;
-            % 0~55 Hz 해당하는 Frequencey만 쳐냄
+            % 4~50 Hz 해당하는 Frequencey만 쳐냄
         end
         
         if isempty(TF2048.f_idx)
@@ -84,7 +84,7 @@ for p = 1:pSize(1)
             TF2048.f_idx    = (F>=TF2048.frange(1)) & (F<=TF2048.frange(2));    % Frequencey 쳐내기
             TF2048.freq     = F(TF2048.f_idx);
             TF2048.time     = T;
-            % 0~55 Hz 해당하는 Frequencey만 쳐냄
+            % 4~50 Hz 해당하는 Frequencey만 쳐냄
         end
     end
 end
