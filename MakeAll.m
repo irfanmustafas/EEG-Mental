@@ -57,7 +57,7 @@ for p = 1:pSize(1)
         if ~sInfo(p,iAge+q), continue, end
         
         disp(dPath);
-        if q < cLimit
+        if q < cLimit || cLimit == 0
             TF256.lines = SaveSet256(dPath, nCh, TF256, elocs);
         else
             TF2048.lines = SaveSet2048(dPath, nCh, TF2048, elocs);
