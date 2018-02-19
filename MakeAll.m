@@ -107,9 +107,6 @@ dPath = '';
 %     % 중도 포기(Drop)한 피험자 뛰어넘기
 %     if sInfo(p, iDO), continue, end
 %     
-%     % 행동 실험 추가되었을 때로 2048Hz 구분
-%     cLimit = sInfo(p,iHav);
-% 
 %     for q = 1:5
 %         dPath = sprintf('E%03d-%d',sInfo(p,iID),q);
 %         
@@ -135,117 +132,99 @@ dPath = '';
 % % save([REP_DIR 'tPwr256.mat'], 'tPwr256', '-v7.3')
 
 %% EEGLAB 데이터 읽어서 Wavelet Power 값 기록 (GetWav256.m)
-% TF 값 불러오기
-load([REP_DIR 'TF.mat'])
+% % TF 값 불러오기
+% load([REP_DIR 'TF.mat'])
+% 
+% msTime = TF256.lines/TF256.Fs*1000;
+% WT.width    = 5;
+% WT.gwidth   = 3;
+% WT.freq     = TF256.frange(1):1:TF256.frange(2);
+% if WT.freq(1) == 0, WT.freq(1) = []; end    % 범위에 0이 포함된 경우 제거, Wavelet은 0값 의미 없음
+% WT.time     = (0:20:(msTime-1/TF256.Fs))*0.001;   % 0.02초 간격 설정
+% WT.fs       = 1/(WT.time(2)-WT.time(1));    % 위에서 간격이 0.02초로 fs는 50됨
+% WT.nFr         = length(WT.freq);
+% WT.nTm         = length(WT.time);
+% 
+% save([REP_DIR 'WT.mat'], 'WT')
+% 
+% % tempWav =  cell(1, 6);  % 각 데이터별 값 임시 저장 생략
+% wPwr256 = cell(0,6);    % 전체 데이터 값 저장
+% 
+% for p = 1:pSize(1)
+%     % 중도 포기(Drop)한 피험자 뛰어넘기
+%     if sInfo(p, iDO), continue, end
+%     
+%     for q = 1:5
+%         dPath = sprintf('E%03d-%d',sInfo(p,iID),q);
+%         
+%         % 예외 처리된 iAge+q 위치를 확인해서 값이 0인 경우 지나감
+%         if ~sInfo(p,iAge+q), continue, end
+%     
+%         disp(dPath);
+%         % Wav 구조는 nCh(2) x nFr(55: 1~55) x nTm (93500, 0.02초 간격 1870초)
+%         Wav = GetWav256(dPath, nCh, WT);
+%         save([REP_DIR dPath '_Wav' '.mat'], 'Wav')
+%         
+%         % 데이터 값 통합 저장 생략
+%         % tempWav(1,1:6) = {pID, pSym, pGen, pAge, pVst, Wav};
+%     end
+% end
 
-msTime = TF256.lines/TF256.Fs*1000;
-WT.width    = 5;
-WT.gwidth   = 3;
-WT.freq     = TF256.frange(1):1:TF256.frange(2);
-if WT.freq(1) == 0, WT.freq(1) = []; end    % 범위에 0이 포함된 경우 제거, Wavelet은 0값 의미 없음
-WT.time     = (0:20:(msTime-1/TF256.Fs))*0.001;   % 0.02초 간격 설정
-WT.fs       = 1/(WT.time(2)-WT.time(1));    % 위에서 간격이 0.02초로 fs는 50됨
-WT.nFr         = length(WT.freq);
-WT.nTm         = length(WT.time);
 
-save([REP_DIR 'WT.mat'], 'WT')
+%% 각 Raw Power 마다 Band 별 Sperctarl Power 계산
+load([REP_DIR 'WT.mat'])
 
-% tempWav =  cell(1, 6);  % 각 데이터별 값 임시 저장 생략
-wPwr256 = cell(0,6);    % 전체 데이터 값 저장
+% 영역 선택, https://en.wikipedia.org/wiki/Electroencephalography
+thFreq  = (WT.freq >= 4)  & (WT.freq < 8);
+apFreq  = (WT.freq >= 8)  & (WT.freq < 13);
+btLFreq = (WT.freq >= 13) & (WT.freq < 20);
+btHFreq = (WT.freq >= 20) & (WT.freq < 30);
+gmFreq  = (WT.freq >= 30) & (WT.freq <= 50);
+
+% 각 데이터별 값 임시 저장
+thWav  =  cell(1, 6);
+apWav  =  cell(1, 6);
+btLWav =  cell(1, 6);
+btHWav =  cell(1, 6);
+gmWav  =  cell(1, 6);
 
 for p = 1:pSize(1)
     % 중도 포기(Drop)한 피험자 뛰어넘기
     if sInfo(p, iDO), continue, end
     
-    % 행동 실험 추가되었을 때로 2048Hz 구분
-    cLimit = sInfo(p,iHav);
+    % pID 피험자 ID, pSym 질환 증상, pGen 성별, pAge 나이
+    pID = sInfo(p,iID); pSym = sInfo(p,iSym); pGen = sInfo(p,iGen); pAge = sInfo(p,iAge);
     
     for q = 1:5
+        % 방문 횟수 pVst
+        pVst = q;
         dPath = sprintf('E%03d-%d',sInfo(p,iID),q);
         
         % 예외 처리된 iAge+q 위치를 확인해서 값이 0인 경우 지나감
-        if ~sInfo(p,iAge+q), continue, end
+        if ~sInfo(p,iAge+q), continue, end    
     
         disp(dPath);
-        % Wav 구조는 nCh(2) x nFr(55: 1~55) x nTm (93500, 0.02초 간격 1870초)
-        Wav = GetWav256(dPath, nCh, WT);
-        save([REP_DIR dPath '_Wav' '.mat'], 'Wav')
+        load([REP_DIR dPath '_Wav' '.mat'])
+
+        thPwr   = squeeze(nanmean(Wav(:,thFreq,:),2));
+        apPwr   = squeeze(nanmean(Wav(:,apFreq,:),2));
+        btLPwr  = squeeze(nanmean(Wav(:,btLFreq,:),2));
+        btHPwr  = squeeze(nanmean(Wav(:,btHFreq,:),2));
+        gmPwr   = squeeze(nanmean(Wav(:,gmFreq,:),2));
         
-        % 데이터 값 통합 저장 생략
-        % tempWav(1,1:6) = {pID, pSym, pGen, pAge, pVst, Wav};
+        thWav(1,1:6)    = {pID, pSym, pGen, pAge, pVst, thPwr};
+        apWav(1,1:6)    = {pID, pSym, pGen, pAge, pVst, apPwr};
+        btLWav(1,1:6)   = {pID, pSym, pGen, pAge, pVst, btLPwr};
+        btHWav(1,1:6)   = {pID, pSym, pGen, pAge, pVst, btHPwr};
+        gmWav(1,1:6)    = {pID, pSym, pGen, pAge, pVst, gmPwr};
+        
+        save([REP_DIR dPath '_thWav' '.mat'], 'thWav')
+        save([REP_DIR dPath '_apWav' '.mat'], 'apWav')
+        save([REP_DIR dPath '_btLWav' '.mat'], 'btLWav')
+        save([REP_DIR dPath '_btHWav' '.mat'], 'btHWav')
+        save([REP_DIR dPath '_gmWav' '.mat'], 'gmWav')        
     end
 end
-
-
-%% 각 Raw Power 마다 Band 별 Sperctarl Power 계산
-% load([REP_DIR 'WT.mat'])
-% 
-% % 영역 선택, https://en.wikipedia.org/wiki/Electroencephalography
-% gmFreq  = (WT.freq >= 30) & (WT.freq <= 55);
-% muFreq  = (WT.freq >= 8) & (WT.freq < 12);
-% apFreq  = (WT.freq >= 8) & (WT.freq < 15);
-% btFreq  = (WT.freq >= 15) & (WT.freq < 30);
-% thFreq  = (WT.freq >= 4) & (WT.freq < 8);
-% dtFreq  = (WT.freq >= 0.2) & (WT.freq < 4);
-% 
-% % 각 데이터별 값 임시 저장
-% gmWav =  cell(1, 6);
-% muWav =  cell(1, 6);
-% apWav =  cell(1, 6);
-% btWav =  cell(1, 6);
-% thWav =  cell(1, 6);
-% dtWav =  cell(1, 6);
-% 
-% % 각 Band 별 별도 파일 저장
-% for p = 1:pSize(1)
-%     if Sinfo(p, iDO), continue, end
-%     
-%     cLimit = Sinfo(p,iHav);
-%     if cLimit == 0, qLimit = 5;
-%     else qLimit = cLimit - 1; end
-%     
-%     % pID 피험자 ID, pSym 질환 증상, pGen 성별, pAge 나이
-%     pID = Sinfo(p,iID); pSym = Sinfo(p,iSym); pGen = Sinfo(p,iGen); pAge = Sinfo(p,iAge);
-%     
-%     % 실험 프로토콜이 바뀌기 전까지 qLimit 표시까지만, qLimit 부터는 2048Hz
-%     for q = 1:qLimit
-%         % 방문 횟수 pVst
-%         pVst = q;
-%         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
-%         
-%         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
-%         % E003-1은 혼자 데이터 길이가 감, E004-1은 2번 채널이 없음
-%         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
-%         if strcmp(dPath, 'E003-1'), continue, end
-%         if strcmp(dPath, 'E004-1'), continue, end
-%         if ~Sinfo(p,iAge+q), continue, end        
-%     
-%         disp(dPath);
-%         load([REP_DIR dPath '_Wav' '.mat'])
-%         
-%         gmPwr   = squeeze(nanmean(Wav(:,gmFreq,:),2));
-%         muPwr   = squeeze(nanmean(Wav(:,muFreq,:),2));
-%         apPwr   = squeeze(nanmean(Wav(:,apFreq,:),2));
-%         btPwr   = squeeze(nanmean(Wav(:,btFreq,:),2));
-%         thPwr   = squeeze(nanmean(Wav(:,thFreq,:),2));
-%         dtPwr   = squeeze(nanmean(Wav(:,dtFreq,:),2));
-%         
-%         gmWav(1,1:6)    = {pID, pSym, pGen, pAge, pVst, gmPwr};
-%         muWav(1,1:6)    = {pID, pSym, pGen, pAge, pVst, muPwr};
-%         apWav(1,1:6)    = {pID, pSym, pGen, pAge, pVst, apPwr};
-%         btWav(1,1:6)    = {pID, pSym, pGen, pAge, pVst, btPwr};
-%         thWav(1,1:6)    = {pID, pSym, pGen, pAge, pVst, thPwr};
-%         dtWav(1,1:6)    = {pID, pSym, pGen, pAge, pVst, dtPwr};
-%         
-%         save([REP_DIR dPath '_gmWav' '.mat'], 'gmWav')
-%         save([REP_DIR dPath '_muWav' '.mat'], 'muWav')
-%         save([REP_DIR dPath '_apWav' '.mat'], 'apWav')
-%         save([REP_DIR dPath '_btWav' '.mat'], 'btWav')
-%         save([REP_DIR dPath '_thWav' '.mat'], 'thWav')
-%         save([REP_DIR dPath '_dtWav' '.mat'], 'dtWav')
-%         
-%     end
-% end
 
 
 %% 자극 구간 설정 후 각 Band별 값
