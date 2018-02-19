@@ -1,10 +1,12 @@
 close all; clear; clc;
 
 load('sInfo.mat');
-sInfo(75,10) = 4;    % E077-4 번부터 2048이라 직접 입력해 줌
-sInfo(76,10) = 4;    % E078-4 번부터 2048이라 직접 입력해 줌
-sInfo(112,8) = 0;    % E114-4 번이 존재하지 않아 직접 입력해 줌.
-sInfo(118,8) = 0;    % E120-4 번이 존재하지 않아 직접 입력해 줌.
+% 피험자 개별 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
+sInfo(75,10) = 4;       % E077-4 번부터 2048이라 직접 입력해 줌
+sInfo(76,10) = 4;       % E078-4 번부터 2048이라 직접 입력해 줌
+sInfo(112,8) = 0;       % E114-4 번이 존재하지 않아 직접 입력해 줌
+sInfo(118,8) = 0;       % E120-4 번이 존재하지 않아 직접 입력해 줌
+sInfo(1,5)   = 0;       % E003-1은 혼자 데이터 길이가 길어서 직접 입력해 줌
 
 pSize = size(sInfo);
 % 피험자 ID 주소 iID, 피험자 질환 주소 iSym, 피험자 성별 주소 iAge, 행동 실험 여부 주소 iHav, 
@@ -38,11 +40,12 @@ dPath = '';
 
 %% TXT Raw DATA EEGLAB 데이터로 변환 과정 (SaveSet.m)
 % for p = 1:pSize(1)
-%     % 중도 포기(Drop)한 피험자 뛰어넘기
+%     % 중도 포기(Drop)한 피험자 및 예외 처리한 피험자 뛰어넘기
 %     if sInfo(p, iDO), continue, end
 %     
 %     % 행동 실험 추가되었을 때로 2048Hz 구분
 %     cLimit = sInfo(p,iHav);
+%     
 %     for q = 1:5
 %         dPath = sprintf('E%03d-%d',sInfo(p,iID),q);
 %         
@@ -106,17 +109,11 @@ dPath = '';
 %     
 %     % 행동 실험 추가되었을 때로 2048Hz 구분
 %     cLimit = sInfo(p,iHav);
+% 
 %     for q = 1:5
 %         dPath = sprintf('E%03d-%d',sInfo(p,iID),q);
 %         
-%         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
-%         % E003-1은 혼자 데이터 길이가 김,
-%         if strcmp(dPath, 'E003-1'), continue, end
-%         % E114-4 데이터 없음
-%         if strcmp(dPath, 'E114-4'), continue, end
-%         % E120-4 데이터 없음
-%         if strcmp(dPath, 'E120-4'), continue, end
-%         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
+%         % 예외 처리된 iAge+q 위치를 확인해서 값이 0인 경우 지나감
 %         if ~sInfo(p,iAge+q), continue, end
 %         
 %         disp(dPath);
@@ -162,17 +159,11 @@ for p = 1:pSize(1)
     
     % 행동 실험 추가되었을 때로 2048Hz 구분
     cLimit = sInfo(p,iHav);
+    
     for q = 1:5
         dPath = sprintf('E%03d-%d',sInfo(p,iID),q);
         
-        % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
-        % E003-1은 혼자 데이터 길이가 김,
-        if strcmp(dPath, 'E003-1'), continue, end
-        % E114-4 데이터 없음
-        if strcmp(dPath, 'E114-4'), continue, end
-        % E120-4 데이터 없음
-        if strcmp(dPath, 'E120-4'), continue, end
-        % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
+        % 예외 처리된 iAge+q 위치를 확인해서 값이 0인 경우 지나감
         if ~sInfo(p,iAge+q), continue, end
     
         disp(dPath);
