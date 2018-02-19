@@ -17,19 +17,19 @@ nCh      = length(chName);
 REP_DIR  = './Rep/';
 TF256.tWin     = 0.50;
 TF256.tShift   = 0.10;
-TF256.Fs       = 256;                  % 256 Hz Resolution
-TF256.frange   = [4 50];                % 0~55 Hz 범위
-TF256.nWin     = fix(TF256.tWin*TF256.Fs);    % nWin은 Fs의 절반(0.05)로 설정, 128
-TF256.nShift   = fix(TF256.tShift*TF256.Fs);  % nShift는 Fs의 1/10(0.1)의 정수로 설정, 25
-TF256.nFFT     = 2^nextpow2(TF256.nWin);      % nWin과 가장 가까운 2의 거듭제곱 수 구하기
+TF256.Fs       = 256;                           % 256 Hz Resolution
+TF256.frange   = [4 50];                        % 4~50 Hz 범위
+TF256.nWin     = fix(TF256.tWin*TF256.Fs);      % nWin은 Fs의 절반(0.05)로 설정, 128
+TF256.nShift   = fix(TF256.tShift*TF256.Fs);    % nShift는 Fs의 1/10(0.1)의 정수로 설정, 25
+TF256.nFFT     = 2^nextpow2(TF256.nWin);        % nWin과 가장 가까운 2의 거듭제곱 수 구하기
 TF256.f_idx = [];
 
 TF2048.tWin     = 0.50;
 TF2048.tShift   = 0.10;
-TF2048.Fs       = 2048;                  % 2048 Hz Resolution
-TF2048.frange   = [4 50];                % 0~55 Hz 범위
-TF2048.nWin     = fix(TF2048.tWin*TF2048.Fs);    % nWin은 Fs의 절반(0.05)로 설정, 128
-TF2048.nShift   = fix(TF2048.tShift*TF2048.Fs);  % nShift는 Fs의 1/10(0.1)의 정수로 설정, 25
+TF2048.Fs       = 2048;                         % 2048 Hz Resolution
+TF2048.frange   = [4 50];                       % 4~50 Hz 범위
+TF2048.nWin     = fix(TF2048.tWin*TF2048.Fs);   % nWin은 Fs의 절반(0.05)로 설정, 128
+TF2048.nShift   = fix(TF2048.tShift*TF2048.Fs); % nShift는 Fs의 1/10(0.1)의 정수로 설정, 25
 TF2048.nFFT     = 2^nextpow2(TF2048.nWin);      % nWin과 가장 가까운 2의 거듭제곱 수 구하기
 TF2048.f_idx = [];
 
@@ -94,11 +94,67 @@ dPath = '';
 
 %% EEGLAB 데이터 읽어서 Raw Power 값 기록 (GetPwr256.m) - 모두 256Hz
 
+% % TF 값 불러오기
+% load([REP_DIR 'TF.mat'])
+% % 피험자 ID, 질환 증상, 성별, 나이, 방문 횟수, Power값 -> n x 6 행렬
+% tempPwr = cell(1,6);    % 각 데이터별 값 임시 저장
+% tPwr256 = cell(0,6);    % 전체 데이터 값 저장
+% 
+% for p = 1:pSize(1)
+%     % 중도 포기(Drop)한 피험자 뛰어넘기
+%     if sInfo(p, iDO), continue, end
+%     
+%     % 행동 실험 추가되었을 때로 2048Hz 구분
+%     cLimit = sInfo(p,iHav);
+%     for q = 1:5
+%         dPath = sprintf('E%03d-%d',sInfo(p,iID),q);
+%         
+%         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
+%         % E003-1은 혼자 데이터 길이가 김,
+%         if strcmp(dPath, 'E003-1'), continue, end
+%         % E114-4 데이터 없음
+%         if strcmp(dPath, 'E114-4'), continue, end
+%         % E120-4 데이터 없음
+%         if strcmp(dPath, 'E120-4'), continue, end
+%         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
+%         if ~sInfo(p,iAge+q), continue, end
+%         
+%         disp(dPath);
+%         
+%         % Pwr 구조는 nCh(2) x nFr(28: 0~54 2간격) x nTm (19144)
+%         % 25/256 = 0.0977초 간격, 윈도우 크기 TF.tShift를 0.1로 정했으니
+%         % 1870초의 약 10 배(256/25 = 10.24배) 좀 더 된 19144 크기가 됨
+%         % 앞에서 256Hz로 모두 맞췄기 때문에 GetPwr256과 TF256으로 통일
+%         Pwr = GetPwr256(dPath, nCh, TF256);
+%         save([REP_DIR dPath '_Pwr' '.mat'], 'Pwr')
+% 
+%         % 전체 값 모아서 저장은 생략
+%         % tempPwr(1,1:6) = {pID, pSym, pGen, pAge, pVst, Pwr};
+%         % tPwr256 = cat(1, tPwr256, tempPwr);
+%     end
+% end
+% 
+% % 전체 값 모아서 저장은 생략
+% % save([REP_DIR 'tPwr256.mat'], 'tPwr256', '-v7.3')
+
+%% EEGLAB 데이터 읽어서 Wavelet Power 값 기록 (GetWav256.m)
 % TF 값 불러오기
 load([REP_DIR 'TF.mat'])
-% 피험자 ID, 질환 증상, 성별, 나이, 방문 횟수, Power값 -> n x 6 행렬
-tempPwr = cell(1,6);    % 각 데이터별 값 임시 저장
-tPwr256 = cell(0,6);    % 전체 데이터 값 저장
+
+msTime = TF256.lines/TF256.Fs*1000;
+WT.width    = 5;
+WT.gwidth   = 3;
+WT.freq     = TF256.frange(1):1:TF256.frange(2);
+if WT.freq(1) == 0, WT.freq(1) = []; end    % 범위에 0이 포함된 경우 제거, Wavelet은 0값 의미 없음
+WT.time     = (0:20:(msTime-1/TF256.Fs))*0.001;   % 0.02초 간격 설정
+WT.fs       = 1/(WT.time(2)-WT.time(1));    % 위에서 간격이 0.02초로 fs는 50됨
+WT.nFr         = length(WT.freq);
+WT.nTm         = length(WT.time);
+
+save([REP_DIR 'WT.mat'], 'WT')
+
+% tempWav =  cell(1, 6);  % 각 데이터별 값 임시 저장 생략
+wPwr256 = cell(0,6);    % 전체 데이터 값 저장
 
 for p = 1:pSize(1)
     % 중도 포기(Drop)한 피험자 뛰어넘기
@@ -118,106 +174,16 @@ for p = 1:pSize(1)
         if strcmp(dPath, 'E120-4'), continue, end
         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
         if ~sInfo(p,iAge+q), continue, end
-        
+    
         disp(dPath);
+        % Wav 구조는 nCh(2) x nFr(55: 1~55) x nTm (93500, 0.02초 간격 1870초)
+        Wav = GetWav256(dPath, nCh, WT);
+        save([REP_DIR dPath '_Wav' '.mat'], 'Wav')
         
-        % Pwr 구조는 nCh(2) x nFr(28: 0~54 2간격) x nTm (19144)
-        % 25/256 = 0.0977초 간격, 윈도우 크기 TF.tShift를 0.1로 정했으니
-        % 1870초의 약 10 배(256/25 = 10.24배) 좀 더 된 19144 크기가 됨
-        % 앞에서 256Hz로 모두 맞췄기 때문에 GetPwr256과 TF256으로 통일
-        Pwr = GetPwr256(dPath, nCh, TF256);
-        save([REP_DIR dPath '_Pwr' '.mat'], 'Pwr')
-
-        % 전체 값 모아서 저장은 생략
-        % tempPwr(1,1:6) = {pID, pSym, pGen, pAge, pVst, Pwr};
-        % tPwr256 = cat(1, tPwr256, tempPwr);
+        % 데이터 값 통합 저장 생략
+        % tempWav(1,1:6) = {pID, pSym, pGen, pAge, pVst, Wav};
     end
 end
-
-% 전체 값 모아서 저장은 생략
-% save([REP_DIR 'tPwr256.mat'], 'tPwr256', '-v7.3')
-
-%% EEGLAB 데이터 읽어서 Wavelet Power 값 기록 (GetWav256.m)
-% % TF 값 불러오기
-% load([REP_DIR 'TF.mat'])
-% 
-% msTime = TF.lines/TF.Fs*1000;
-% WT.width    = 5;
-% WT.gwidth   = 3;
-% WT.freq     = TF.frange(1):1:TF.frange(2);
-% if WT.freq(1) == 0, WT.freq(1) = []; end    % 범위에 0이 포함된 경우 제거, Wavelet은 0값 의미 없음
-% WT.time     = (0:20:(msTime-1/Fs))*0.001;   % 0.02초 간격 설정
-% WT.fs       = 1/(WT.time(2)-WT.time(1));    % 위에서 간격이 0.02초로 fs는 50됨
-% WT.nFr         = length(WT.freq);
-% WT.nTm         = length(WT.time);
-% 
-% save([REP_DIR 'WT.mat'], 'WT')
-% 
-% tempWav =  cell(1, 6);  % 각 데이터별 값 임시 저장
-% wPwr256 = cell(0,6);    % 전체 데이터 값 저장
-% 
-% for p = 1:pSize(1)
-%     if Sinfo(p, iDO), continue, end
-%     
-%     cLimit = Sinfo(p,iHav);
-%     if cLimit == 0, qLimit = 5;
-%     else qLimit = cLimit - 1; end
-%     
-%     % pID 피험자 ID, pSym 질환 증상, pGen 성별, pAge 나이
-%     pID = Sinfo(p,iID); pSym = Sinfo(p,iSym); pGen = Sinfo(p,iGen); pAge = Sinfo(p,iAge);
-%     
-%     % 실험 프로토콜이 바뀌기 전까지 qLimit 표시까지만, qLimit 부터는 2048Hz
-%     for q = 1:qLimit
-%         % 방문 횟수 pVst
-%         pVst = q;
-%         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
-%         
-%         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
-%         % E003-1은 혼자 데이터 길이가 감, E004-1은 2번 채널이 없음
-%         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
-%         if strcmp(dPath, 'E003-1'), continue, end
-%         if strcmp(dPath, 'E004-1'), continue, end
-%         if ~Sinfo(p,iAge+q), continue, end        
-%     
-%         disp(dPath);
-%         % Wav 구조는 nCh(2) x nFr(55: 1~55) x nTm (93500, 0.02초 간격 1870초)
-%         Wav = GetWav256(dPath, nCh, WT);
-%         tempWav(1,1:6) = {pID, pSym, pGen, pAge, pVst, Wav};
-%         save([REP_DIR dPath '_Wav' '.mat'], 'Wav')
-%     end
-% end
-% 
-% % 전체 저장용 wPwr256 변수 만들기 위해 별도로 돌리기 (메모리 부족 예상)
-% for p = 1:pSize(1)
-%     if Sinfo(p, iDO), continue, end
-%     
-%     cLimit = Sinfo(p,iHav);
-%     if cLimit == 0, qLimit = 5;
-%     else qLimit = cLimit - 1; end
-%     
-%     % pID 피험자 ID, pSym 질환 증상, pGen 성별, pAge 나이
-%     pID = Sinfo(p,iID); pSym = Sinfo(p,iSym); pGen = Sinfo(p,iGen); pAge = Sinfo(p,iAge);
-%     
-%     % 실험 프로토콜이 바뀌기 전까지 qLimit 표시까지만, qLimit 부터는 2048Hz
-%     for q = 1:qLimit
-%         % 방문 횟수 pVst
-%         pVst = q;
-%         dPath = sprintf('E%03d-%d',Sinfo(p,iID),q);
-%         
-%         % 예외 처리 (E080-2의 'EEG-.txt'는 EEG-2.txt'로 직접 변경)
-%         % E003-1은 혼자 데이터 길이가 감, E004-1은 2번 채널이 없음
-%         % iAge+q 위치는 데이터가 있는지 없는지 봐서 없는 경우 지나감
-%         if strcmp(dPath, 'E003-1'), continue, end
-%         if strcmp(dPath, 'E004-1'), continue, end
-%         if ~Sinfo(p,iAge+q), continue, end        
-%     
-%         disp(dPath);
-%         load([REP_DIR dPath '_Wav' '.mat'])
-%         tempWav(1,1:6) = {pID, pSym, pGen, pAge, pVst, Wav};
-%         wPwr256 = cat(1, wPwr256, tempWav);
-%     end
-% end
-% save([REP_DIR 'wPwr256.mat'], 'wPwr256', '-v7.3')
 
 
 %% 각 Raw Power 마다 Band 별 Sperctarl Power 계산
