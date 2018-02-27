@@ -369,7 +369,7 @@ for p = 1:pSize(1)
         end
 
         % 전체 변수에 누적 저장
-            totalTable256 = cat(1, totalTable256, pTable);
+        totalTable256 = cat(1, totalTable256, pTable);
     end
     
     save([REP_DIR 'totalTable256.mat'], 'totalTable256', '-v7.3')
